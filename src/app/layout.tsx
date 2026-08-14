@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,16 +11,24 @@ export const metadata: Metadata = {
   description:
     "한국인의 성씨와 본관, 시조의 유래를 찾아보고 나만의 가계도를 만들어보세요. 성씨 검색, 항렬 이야기, 역사 연대표까지.",
   keywords: ["족보", "성씨", "본관", "시조", "가계도", "항렬", "뿌리찾기"],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.vercel.app"),
   openGraph: {
     title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
     description: "성씨의 유래와 본관, 시조를 찾아보고 나만의 가계도를 만들어보세요.",
     type: "website",
     locale: "ko_KR",
+    siteName: "뿌리찾기",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
+    description: "성씨 75개, 본관 604개. 내 본관이 어디인지 찾아보세요.",
   },
 };
 
 const NAV = [
   { href: "/surnames", label: "성씨 찾기" },
+  { href: "/joseon", label: "조선시대 나는?" },
   { href: "/family-tree", label: "가계도 만들기" },
   { href: "/history", label: "역사 연대표" },
   { href: "/stories", label: "족보 이야기" },
@@ -66,10 +75,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 성씨·본관 데이터는 통계청 「2015 인구주택총조사 성씨·본관 집계」와 공개된 문중 기록을 바탕으로 정리한
                 교육·참고용 요약본입니다. 문중별 공식 족보와 세부 내용이 다를 수 있으며, 법적 효력을 갖지 않습니다.
               </p>
-              <p className="mt-4 text-xs opacity-70">© {new Date().getFullYear()} 뿌리찾기 · 학습용 프로젝트</p>
+              <p className="mt-4">
+                문의·오류 제보:{" "}
+                <a
+                  href="mailto:dbsqja9288@gmail.com"
+                  className="text-accent underline underline-offset-2 transition hover:opacity-80"
+                >
+                  dbsqja9288@gmail.com
+                </a>
+              </p>
+              <p className="mt-2 text-xs leading-relaxed opacity-80">
+                「조선시대였다면 나는?」은 재미를 위한 콘텐츠이며, 실제 신분·혈통·가치와 무관합니다. 수록 내용에 사실과
+                다른 부분이 있으면 위 메일로 알려주시면 확인 후 수정하겠습니다.
+              </p>
+              <p className="mt-4 text-xs opacity-70">© {new Date().getFullYear()} 뿌리찾기</p>
             </div>
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );

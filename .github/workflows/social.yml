@@ -1,14 +1,13 @@
 name: 스레드 자동 게시
 
-# 하루 3회. cron은 UTC 기준이라 한국시간 -9시간으로 적는다.
-#  23:00 UTC = 08:00 KST  (출근길)
-#  03:30 UTC = 12:30 KST  (점심)
-#  10:00 UTC = 19:00 KST  (퇴근 후)
 on:
   schedule:
     - cron: "0 23 * * *"
+    - cron: "30 1 * * *"
     - cron: "30 3 * * *"
+    - cron: "0 6 * * *"
     - cron: "0 10 * * *"
+    - cron: "0 13 * * *"
   workflow_dispatch: # 수동 실행 버튼
 
 jobs:

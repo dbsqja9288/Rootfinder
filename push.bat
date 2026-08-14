@@ -29,7 +29,7 @@ echo.
 
 echo [2/3] commit
 git commit -m "%MSG%"
-if errorlevel 1 goto NOCHANGE
+if errorlevel 1 echo   (no new changes to commit - will still push pending commits)
 echo.
 
 echo [3/3] push
@@ -37,16 +37,11 @@ git push
 if errorlevel 1 goto FAILED
 
 echo.
+git status -sb
+echo.
 echo ==========================================
 echo   DONE. Vercel will redeploy in 2-3 min.
 echo ==========================================
-echo.
-pause
-exit /b 0
-
-:NOCHANGE
-echo.
-echo Nothing to commit - already up to date.
 echo.
 pause
 exit /b 0

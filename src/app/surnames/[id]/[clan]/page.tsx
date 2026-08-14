@@ -157,6 +157,20 @@ export default async function ClanPage({
         </section>
       )}
 
+      {/* 조선시대 콘텐츠 진입 */}
+      <section className="card mt-10 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-accent p-6">
+        <div>
+          <h3 className="serif font-bold">조선시대였다면 {entry.fullName}은 어떤 가문이었을까?</h3>
+          <p className="mt-1 text-sm text-inksoft">MBTI까지 고르면 내 직업도 나옵니다 · 재미로 보는 콘텐츠</p>
+        </div>
+        <Link
+          href="/joseon"
+          className="rounded-xl bg-accent px-5 py-2.5 font-medium text-white transition hover:opacity-90 dark:text-stone-900"
+        >
+          확인하기
+        </Link>
+      </section>
+
       {/* 같은 본관, 다른 성씨 */}
       {others.length > 0 && (
         <section className="mt-10">

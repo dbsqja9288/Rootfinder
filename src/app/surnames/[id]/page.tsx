@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SURNAMES, getSurname, CLAN_DISCLAIMER } from "@/data/surnames";
-import ClanList from "@/components/ClanList";
-import DeepDive from "@/components/DeepDive";
-import { isDeepDiveEnabled } from "@/lib/ai";
+import { SURNAMES, getSurname } from "@/data/surnames";
 
 export function generateStaticParams() {
   return SURNAMES.map((s) => ({ id: s.id }));
@@ -56,7 +53,7 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
               {s.population.toLocaleString()}명
             </span>
             <span className="rounded-full border border-line px-3 py-1 text-inksoft">
-              수록 본관 {s.allClans?.length ?? s.clans.length}개
+              수록 본관 {s.clans.length}개
             </span>
           </div>
         </div>
@@ -99,31 +96,6 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
           ))}
         </div>
       </section>
-
-      {/* 전체 본관 목록 */}
-      {s.allClans && s.allClans.length > s.clans.length && (
-        <section className="mt-10">
-          <h2 className="serif mb-1 text-xl font-bold">
-            {s.ko}씨 본관 전체 <span className="text-accent">{s.allClans.length}</span>개
-          </h2>
-          <p className="mb-4 text-sm text-inksoft">
-            본관을 누르면 그 본관만의 상세 페이지로 들어갑니다. 색이 진한 {s.clans.length}개가 주요 본관입니다.
-          </p>
-          <ClanList clans={s.allClans} detailed={s.clans.map((c) => c.name)} surnameKo={s.ko} surnameId={s.id} />
-          <p className="mt-3 text-xs leading-relaxed text-inksoft">※ {CLAN_DISCLAIMER}</p>
-        </section>
-      )}
-
-      {/* AI 심층 해설 (API 키가 설정된 경우에만 노출) */}
-      {isDeepDiveEnabled() && (
-        <section className="mt-10">
-          <h2 className="serif mb-1 text-xl font-bold">더 깊이 알아보기</h2>
-          <p className="mb-4 text-sm text-inksoft">
-            궁금한 본관을 고르면 역사적 배경과 인물을 자세히 풀어 드립니다.
-          </p>
-          <DeepDive surname={`${s.ko}(${s.hanja})`} clans={s.allClans ?? []} />
-        </section>
-      )}
 
       {/* 항렬 */}
       {s.hangryeol && (

@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | 홈 | `/` | 히어로 + 통합 검색 + 인기 성씨 |
 | 성씨 찾기 | `/surnames` | 실시간 검색 + 초성 필터 (한글/한자/본관/시조/인물 검색) |
-| 성씨 상세 | `/surnames/[id]` | 유래, 주요 본관 상세, **전체 본관 목록**, 항렬자, 대표 인물, (선택) AI 심층 해설 |
+| 성씨 상세 | `/surnames/[id]` | 유래, 본관별 시조·인구 막대, 항렬자, 대표 인물 |
 | 가계도 만들기 | `/family-tree` | SVG 가계도 편집 + PNG/SVG 다운로드, 브라우저 자동 저장 |
 | 역사 연대표 | `/history` | 고조선~현대, 성씨 제도의 변천 타임라인 |
 | 족보 이야기 | `/stories` | 족보 입문 6편 + 촌수 계산기 |
@@ -20,7 +20,6 @@
 - **React 19** / **TypeScript**
 - **Tailwind CSS v4** (CSS 변수 기반 테마, 다크모드 자동 대응)
 - 외부 DB 없음 — 데이터는 `src/data/*.ts`에 정적으로 관리
-- AI 해설은 **선택 기능** — API 키가 없으면 UI에 나타나지 않아 비용이 발생하지 않는다
 
 ## 로컬 실행
 
@@ -55,16 +54,10 @@ src/
 │  ├─ FamilyTree.tsx        # 가계도 편집기 (client)
 │  └─ ChonsuCalculator.tsx  # 촌수 계산기 (client)
 ├─ data/
-│  ├─ types.ts              # Surname / Clan 타입
-│  ├─ surnames-core.ts      # 인구 1~40위 성씨 (해설 상세)
-│  ├─ surnames-more.ts      # 41위 이후 성씨
-│  ├─ clans.ts              # 성씨별 본관 전체 목록 (548개)
-│  ├─ surnames.ts           # 위 세 파일을 병합해 SURNAMES로 export
+│  ├─ surnames.ts           # 성씨 40개 · 본관 114개
 │  └─ timeline.ts           # 연대표 8개 시대 + 족보 아티클 6편
 └─ lib/
-   ├─ tree.ts               # 가계도 레이아웃 알고리즘 (tidy tree)
-   ├─ search.ts             # 정확도 가중치 검색
-   └─ ai.ts                 # AI 심층 해설 (키 없으면 비활성)
+   └─ tree.ts               # 가계도 레이아웃 알고리즘 (tidy tree)
 ```
 
 ## 배포 (Vercel)
@@ -85,25 +78,9 @@ NEXT_PUBLIC_SITE_URL = https://your-project.vercel.app
 
 이후 `main` 브랜치에 push할 때마다 자동으로 재배포됩니다.
 
-## AI 심층 해설 켜기 (선택)
-
-기본 상태에서는 **비활성이라 비용이 0원**이다. 정적 데이터만으로 부족할 때 아래 환경변수를 넣으면
-성씨 상세 페이지에 "더 깊이 알아보기" 섹션이 나타난다.
-
-```
-ANTHROPIC_API_KEY = sk-ant-...      # 또는 OPENAI_API_KEY
-AI_MODEL          = claude-haiku-4-5  # 선택. 기본값도 동일
-```
-
-- 로컬에서는 프로젝트 루트에 `.env.local` 파일을 만들어 넣는다.
-- Vercel에서는 Settings → Environment Variables에 추가 후 Redeploy.
-- 같은 질문은 24시간 캐시하고, IP당 분당 8회로 제한해 비용이 튀지 않게 막아 두었다 (`src/app/api/deep-dive/route.ts`).
-- AI가 생성한 문단에는 "AI 생성 — 사실 확인 필요" 배지가 붙는다. 검증된 정적 데이터와 구분하기 위함이다.
-
 ## 데이터 추가하기
 
-`src/data/surnames-core.ts`(또는 `surnames-more.ts`)의 배열에 객체 하나를 추가하면
-목록·상세·사이트맵·검색에 자동 반영됩니다. 본관 이름만 늘리려면 `src/data/clans.ts`에 추가하면 됩니다.
+`src/data/surnames.ts`의 `SURNAMES` 배열에 객체 하나를 추가하면 목록·상세·사이트맵에 자동 반영됩니다.
 
 ```ts
 {

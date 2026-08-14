@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
+import { SURNAMES } from "@/data/surnames";
 import HomeSearch from "@/components/HomeSearch";
 
 export default function Home() {
   const top = SURNAMES.slice(0, 12);
+  const totalClans = SURNAMES.reduce((a, s) => a + s.clans.length, 0);
 
   return (
     <div>
@@ -44,7 +45,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:py-28">
           <div className="fade-up max-w-2xl">
             <p className="mb-4 inline-block rounded-full border border-line bg-elev px-3 py-1 text-xs text-inksoft">
-              성씨 {SURNAMES.length}개 · 본관 {TOTAL_CLAN_COUNT.toLocaleString()}개 수록
+              성씨 {SURNAMES.length}개 · 본관 {totalClans}개 수록
             </p>
             <h1 className="serif text-4xl leading-tight font-bold sm:text-6xl">
               나의 성(姓)은

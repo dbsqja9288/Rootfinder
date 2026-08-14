@@ -9,7 +9,7 @@ import { ogFont } from "@/lib/og";
  *
  * 주소가 순수 ASCII여야 외부 서비스(스레드 등)가 이미지를 가져올 수 있어서,
  * 본관·MBTI를 이름이 아니라 **인덱스 숫자**로 받는다.
- *   /api/joseon-card?c=42&m=4
+ *   /api/joseon-card?c=0&m=8
  */
 export const runtime = "nodejs";
 
@@ -43,9 +43,18 @@ export async function GET(req: Request) {
           position: "relative",
         }}
       >
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 14, display: "flex", backgroundColor: accent }} />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: 14,
+            display: "flex",
+            backgroundColor: accent,
+          }}
+        />
 
-        {/* 성씨 낙관 */}
         <div
           style={{
             display: "flex",
@@ -67,7 +76,6 @@ export async function GET(req: Request) {
         </div>
         <div style={{ display: "flex", fontSize: 26, color: "#a8a29e", marginTop: 14 }}>조선시대였다면 당신은</div>
 
-        {/* 직업 */}
         <div style={{ display: "flex", fontSize: r.job.name.length > 7 ? 76 : 96, color: accent, marginTop: 10 }}>
           {r.job.name}
         </div>
@@ -75,7 +83,6 @@ export async function GET(req: Request) {
           <div style={{ display: "flex", fontSize: 28, color: "#a8a29e", marginTop: 8 }}>{r.job.hanja}</div>
         )}
 
-        {/* 설명 */}
         <div
           style={{
             display: "flex",
@@ -90,7 +97,6 @@ export async function GET(req: Request) {
           {r.job.desc.length > 62 ? r.job.desc.slice(0, 60) + "…" : r.job.desc}
         </div>
 
-        {/* 등급 */}
         <div
           style={{
             display: "flex",
@@ -115,13 +121,19 @@ export async function GET(req: Request) {
           뿌리찾기 · 재미로 보는 콘텐츠입니다
         </div>
 
-        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 14, display: "flex", backgroundColor: accent }} />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: 14,
+            display: "flex",
+            backgroundColor: accent,
+          }}
+        />
       </div>
     ),
-    {
-      width: W,
-      height: H,
-      fonts: [{ name: "NotoSansKR", data: font, weight: 700, style: "normal" }],
-    }
+    { width: W, height: H, fonts: [{ name: "NotoSansKR", data: font, weight: 700, style: "normal" }] }
   );
 }

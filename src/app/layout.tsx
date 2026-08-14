@@ -18,11 +18,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "뿌리찾기",
+    images: [{ url: "/share-preview.png", width: 1200, height: 630, alt: "김해 김씨 — 시조와 본관 정보" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
-    description: "성씨 75개, 본관 604개. 내 본관이 어디인지 찾아보세요.",
+    description: "성씨 75개, 본관 605개. 내 본관이 어디인지 찾아보세요.",
+    images: ["/share-preview.png"],
   },
 };
 

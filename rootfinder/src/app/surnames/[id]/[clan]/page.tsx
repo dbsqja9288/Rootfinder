@@ -10,6 +10,7 @@ import {
 } from "@/lib/clan-index";
 import { CLAN_DISCLAIMER } from "@/data/surnames";
 import { isDeepDiveEnabled } from "@/lib/ai";
+import { getPatriots } from "@/data/patriots";
 import DeepDive from "@/components/DeepDive";
 
 export function generateStaticParams() {
@@ -48,6 +49,7 @@ export default async function ClanPage({
   const siblings = siblingClans(entry);
   const others = sameRegionClans(entry);
   const d = entry.detail;
+  const patriots = getPatriots(entry.surnameId, entry.slug);
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
@@ -154,6 +156,32 @@ export default async function ClanPage({
         <section className="mt-10">
           <h2 className="serif mb-3 text-xl font-bold">더 깊이 알아보기</h2>
           <DeepDive surname={`${entry.surnameKo}(${entry.surnameHanja})`} clans={[entry.clanName]} />
+        </section>
+      )}
+
+      {/* 독립운동가 */}
+      {patriots.length > 0 && (
+        <section className="mt-10">
+          <h2 className="serif mb-1 text-xl font-bold">
+            이 가문에서 나온 독립운동가 {patriots.length}명
+          </h2>
+          <p className="mb-4 text-sm text-inksoft">
+            나라를 잃었을 때 {entry.fullName} 사람들은 이렇게 싸웠습니다.
+          </p>
+          <ul className="space-y-3">
+            {patriots.map((p) => (
+              <li key={p.name} className="card border-l-4 border-l-celadon p-5">
+                <p className="font-medium">
+                  {p.name}
+                  {p.years && <span className="ml-2 text-xs text-inksoft">{p.years}</span>}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-inksoft">{p.note}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs leading-relaxed text-inksoft">
+            ※ 공개된 전기·문중 기록을 참고해 정리했습니다. 자료에 따라 본관 표기가 다를 수 있습니다.
+          </p>
         </section>
       )}
 

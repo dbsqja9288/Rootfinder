@@ -1,0 +1,29 @@
+name: 스레드 자동 게시
+
+# 하루 3회. cron은 UTC 기준이라 한국시간 -9시간으로 적는다.
+#  23:00 UTC = 08:00 KST  (출근길)
+#  03:30 UTC = 12:30 KST  (점심)
+#  10:00 UTC = 19:00 KST  (퇴근 후)
+on:
+  schedule:
+    - cron: "0 23 * * *"
+    - cron: "30 3 * * *"
+    - cron: "0 10 * * *"
+  workflow_dispatch: # 수동 실행 버튼
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 문안 생성 및 게시
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://rootfinder-pi.vercel.app' }}
+        run: node scripts/social-post.mjs | tee $GITHUB_STEP_SUMMARY

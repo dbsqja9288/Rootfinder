@@ -22,17 +22,29 @@ if exist "_restore.zip" del /f /q "_restore.zip" >nul 2>&1
 set "MSG=%*"
 if not defined MSG set "MSG=update from Claude"
 
-echo [1/3] staging changes
+echo [1/4] staging changes
 git add -A
 git status --short
 echo.
 
-echo [2/3] commit
+echo [2/4] commit
 git commit -m "%MSG%"
-if errorlevel 1 echo   (no new changes to commit - will still push pending commits)
+if errorlevel 1 echo   (no new changes - will still push pending commits)
 echo.
 
-echo [3/3] push
+echo [3/4] sync with remote
+git fetch origin
+git merge --no-edit -X ours origin/main
+if errorlevel 1 (
+  echo.
+  echo   merge conflict - stopping. Show this screen to Claude.
+  echo.
+  pause
+  exit /b 1
+)
+echo.
+
+echo [4/4] push
 git push
 if errorlevel 1 goto FAILED
 

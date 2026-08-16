@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
-    description: "성씨 75개, 본관 605개. 내 본관이 어디인지 찾아보세요.",
+    description: "성씨 123개, 본관 706개. 내 본관이 어디인지 찾아보세요.",
     images: ["/share-preview.png"],
   },
 };

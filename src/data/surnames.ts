@@ -1,6 +1,8 @@
 import { CORE_SURNAMES } from "./surnames-core";
 import { MORE_SURNAMES } from "./surnames-more";
+import { RARE_SURNAMES } from "./surnames-rare";
 import { EXTRA_CLANS } from "./clans";
+import { stripSurnameSuffix } from "./surname-utils";
 import type { Surname } from "./types";
 
 export type { Surname, Clan } from "./types";
@@ -12,7 +14,7 @@ export { CLAN_DISCLAIMER } from "./clans";
  */
 function merge(list: Surname[]): Surname[] {
   return list.map((s) => {
-    const detailed = s.clans.map((c) => c.name.replace(/\s*[가-힣]씨$/, "").trim());
+    const detailed = s.clans.map((c) => stripSurnameSuffix(c.name, s.ko));
     const extra = (EXTRA_CLANS[s.id] ?? [])
       .map((n) => n.trim())
       .filter((n, i, arr) => arr.indexOf(n) === i) // 목록 내 중복 제거
@@ -22,9 +24,11 @@ function merge(list: Surname[]): Surname[] {
   });
 }
 
-export const SURNAMES: Surname[] = merge([...CORE_SURNAMES, ...MORE_SURNAMES]).sort(
-  (a, b) => a.rank - b.rank
-);
+export const SURNAMES: Surname[] = merge([
+  ...CORE_SURNAMES,
+  ...MORE_SURNAMES,
+  ...RARE_SURNAMES,
+]).sort((a, b) => a.rank - b.rank);
 
 export const CHOSUNG_LIST = ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
 

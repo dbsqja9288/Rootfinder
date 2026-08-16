@@ -34,7 +34,7 @@ export default function JoseonPage() {
       <section className="mt-16">
         <h2 className="serif mb-1 text-xl font-bold">등급은 이렇게 나뉩니다</h2>
         <p className="mb-5 text-sm text-inksoft">
-          본관에 남은 공개 기록의 양(정승·왕비 배출, 문과 급제자 수 등)을 점수화해 605개 본관을 줄 세운 결과입니다.
+          본관에 남은 공개 기록의 양(정승·왕비 배출, 문과 급제자 수 등)을 점수화해 700여 개 본관을 줄 세운 결과입니다.
         </p>
         <ul className="space-y-3">
           {TIER_ORDER.map((id) => {

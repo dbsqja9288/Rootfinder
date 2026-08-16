@@ -39,7 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# 복구용 임시 파일
-_restore.zip
-_to_delete/

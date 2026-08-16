@@ -1,5 +1,14 @@
-name: 스레드 자동 게시
+name: 소셜 자동 게시 (스레드 + X)
 
+# 하루 6회. cron은 UTC 기준이라 한국시간 -9시간으로 적는다.
+#  23:00 UTC = 08:00 KST  출근길
+#  01:30 UTC = 10:30 KST  오전
+#  03:30 UTC = 12:30 KST  점심
+#  06:00 UTC = 15:00 KST  오후
+#  10:00 UTC = 19:00 KST  퇴근 후
+#  13:00 UTC = 22:00 KST  잠들기 전
+#
+# 이 시각 순서는 scripts/variants.mjs의 SLOTS와 같아야 A/B 교대가 정확히 맞는다.
 on:
   schedule:
     - cron: "0 23 * * *"
@@ -9,20 +18,57 @@ on:
     - cron: "0 10 * * *"
     - cron: "0 13 * * *"
   workflow_dispatch: # 수동 실행 버튼
+    inputs:
+      variant:
+        description: "올릴 소재 (비워두면 시간대에 따라 자동 교대)"
+        required: false
+        type: choice
+        options: ["", "A", "B"]
+        default: ""
 
 jobs:
-  post:
+  threads:
+    name: 스레드
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
-      - name: 문안 생성 및 게시
+      - name: 스레드 게시
         env:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           SITE_URL: ${{ vars.SITE_URL || 'https://rootfinder-pi.vercel.app' }}
-        run: node scripts/social-post.mjs | tee $GITHUB_STEP_SUMMARY
+          VARIANT: ${{ inputs.variant }}
+        shell: bash
+        run: |
+          # pipefail이 없으면 node가 죽어도 tee의 성공 코드로 덮여 실패가 감춰진다
+          set -o pipefail
+          node scripts/social-post.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+
+  x:
+    name: X
+    runs-on: ubuntu-latest
+    # 스레드와 독립적으로 돈다. 한쪽이 실패해도 다른 쪽은 올라간다.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: X 게시
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://rootfinder-pi.vercel.app' }}
+          VARIANT: ${{ inputs.variant }}
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/x-post.mjs | tee -a "$GITHUB_STEP_SUMMARY"

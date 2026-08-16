@@ -100,6 +100,33 @@ AI_MODEL          = claude-haiku-4-5  # 선택. 기본값도 동일
 - 같은 질문은 24시간 캐시하고, IP당 분당 8회로 제한해 비용이 튀지 않게 막아 두었다 (`src/app/api/deep-dive/route.ts`).
 - AI가 생성한 문단에는 "AI 생성 — 사실 확인 필요" 배지가 붙는다. 검증된 정적 데이터와 구분하기 위함이다.
 
+## 스레드 자동 게시 (선택)
+
+`.github/workflows/social.yml`이 하루 3회(08:00 / 12:30 / 19:00 KST) 실행되어
+`scripts/social-post.mjs`가 만든 문안을 스레드에 올립니다. **GitHub Actions는 공개 저장소에서 무료**이고,
+스레드 API도 무료입니다.
+
+토큰이 없으면 초안만 출력하고 끝나므로, 설정 전에도 워크플로가 실패하지 않습니다.
+
+### 설정
+
+1. [Meta 개발자 콘솔](https://developers.facebook.com)에서 앱을 만들고 **Threads API**를 추가
+2. 장기 액세스 토큰과 사용자 ID 발급
+3. GitHub 저장소 → Settings → Secrets and variables → Actions 에서 등록
+
+```
+THREADS_USER_ID        (Secret)
+THREADS_ACCESS_TOKEN   (Secret)
+SITE_URL               (Variable) https://your-site.vercel.app
+```
+
+Actions 탭에서 **Run workflow** 버튼으로 즉시 테스트할 수 있습니다.
+
+### 왜 X는 자동이 아닌가
+
+X API는 무료 등급의 게시 한도가 매우 낮고, **같은 링크를 기계적으로 반복 게시하면 스팸으로 판정되어
+계정이 정지**됩니다. X는 함께 제공되는 `posting-kit.html`로 문안을 뽑아 직접 올리는 방식을 권장합니다.
+
 ## 데이터 추가하기
 
 `src/data/surnames-core.ts`(또는 `surnames-more.ts`)의 배열에 객체 하나를 추가하면

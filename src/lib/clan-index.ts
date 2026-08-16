@@ -1,5 +1,6 @@
 import { SURNAMES } from "@/data/surnames";
 import { getRegion, type Region } from "@/data/regions";
+import { stripSurnameSuffix } from "@/data/surname-utils";
 import type { Clan, Surname } from "@/data/types";
 
 /** 본관 하나를 성씨와 묶은 단위. 사이트의 최소 페이지 단위이기도 하다. */
@@ -30,7 +31,7 @@ function build(): ClanEntry[] {
   for (const s of SURNAMES) {
     const detailMap = new Map<string, Clan>();
     for (const c of s.clans) {
-      detailMap.set(toSlug(c.name.replace(/\s*[가-힣]씨$/, "").trim()), c);
+      detailMap.set(toSlug(stripSurnameSuffix(c.name, s.ko)), c);
     }
 
     for (const raw of s.allClans ?? []) {

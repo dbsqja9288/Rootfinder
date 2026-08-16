@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:regions": "tsx scripts/check-regions.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

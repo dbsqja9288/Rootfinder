@@ -49,7 +49,8 @@ function build(): ClanEntry[] {
         fullName: `${raw} ${s.ko}씨`,
         compact: `${slug}${s.ko}씨`,
         detail: detailMap.get(slug),
-        region: getRegion(raw),
+        // 해설이 있는 본관은 한자를 넘겨 동음이의(광주 廣州/光州)를 정확히 가른다
+        region: getRegion(raw, detailMap.get(slug)?.hanja),
         href: `/surnames/${s.id}/${encodeURIComponent(slug)}`,
       });
     }

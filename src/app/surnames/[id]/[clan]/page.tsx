@@ -12,6 +12,9 @@ import { CLAN_DISCLAIMER } from "@/data/surnames";
 import { isDeepDiveEnabled } from "@/lib/ai";
 import { getPatriots } from "@/data/patriots";
 import DeepDive from "@/components/DeepDive";
+import JsonLd, { clanSchema, breadcrumbSchema } from "@/components/JsonLd";
+import AdSlot from "@/components/AdSlot";
+import ReportError from "@/components/ReportError";
 
 export function generateStaticParams() {
   return CLAN_ENTRIES.map((c) => ({ id: c.surnameId, clan: c.slug }));
@@ -53,6 +56,23 @@ export default async function ClanPage({
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
+      <JsonLd
+        data={clanSchema({
+          fullName: entry.fullName,
+          href: entry.href,
+          description: `${entry.fullName}의 시조와 본관 지역, 인구를 정리했습니다.`,
+          regionNow: entry.region?.now,
+          founder: d?.founder,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "성씨 찾기", href: "/surnames" },
+          { name: `${entry.surnameKo}씨`, href: `/surnames/${entry.surnameId}` },
+          { name: entry.fullName, href: entry.href },
+        ])}
+      />
+
       {/* 빵부스러기 */}
       <nav className="flex flex-wrap items-center gap-1.5 text-sm text-inksoft">
         <Link href="/surnames" className="transition hover:text-accent">
@@ -87,7 +107,9 @@ export default async function ClanPage({
             <dd className="mt-1 font-medium">{d?.founder ?? "기록 확인 필요"}</dd>
           </div>
           <div className="card p-4">
-            <dt className="text-xs text-inksoft">본관 지역</dt>
+            <dt className="text-xs text-inksoft">
+              본관 지역{d?.hanja && <span className="ml-1 opacity-70">({d.hanja})</span>}
+            </dt>
             <dd className="mt-1 font-medium">{entry.region?.now ?? "확인 필요"}</dd>
           </div>
           <div className="card p-4">
@@ -262,6 +284,16 @@ export default async function ClanPage({
           가계도 만들기
         </Link>
       </section>
+
+      <ReportError
+        fullName={entry.fullName}
+        href={entry.href}
+        hanja={d?.hanja}
+        founder={d?.founder}
+        region={entry.region?.now}
+      />
+
+      <AdSlot />
     </article>
   );
 }

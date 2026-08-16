@@ -1,14 +1,27 @@
 import type { MetadataRoute } from "next";
 import { SURNAMES } from "@/data/surnames";
 import { CLAN_ENTRIES } from "@/lib/clan-index";
+import { SITE_URL } from "@/lib/site";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.vercel.app";
+const BASE = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/surnames", "/joseon", "/family-tree", "/history", "/stories"].map((p) => ({
+  const staticRoutes = [
+    "",
+    "/surnames",
+    "/joseon",
+    "/family-tree",
+    "/history",
+    "/stories",
+    "/about",
+    "/corrections",
+    "/legal/privacy",
+    "/legal/terms",
+  ].map((p) => ({
     url: `${BASE}${p}`,
     lastModified: new Date(),
-    priority: p === "" ? 1 : 0.8,
+    // 약관류는 색인은 되게 두되 우선순위는 낮춘다
+    priority: p === "" ? 1 : p.startsWith("/legal") ? 0.3 : 0.8,
   }));
 
   const surnameRoutes = SURNAMES.map((s) => ({

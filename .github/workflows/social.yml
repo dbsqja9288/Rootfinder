@@ -52,7 +52,16 @@ jobs:
   x:
     name: X
     runs-on: ubuntu-latest
-    # 스레드와 독립적으로 돈다. 한쪽이 실패해도 다른 쪽은 올라간다.
+    # 기본은 꺼져 있다.
+    #
+    # X는 2026년 2월부터 무료 등급이 없어지고 선불 크레딧 종량제로 바뀌었다.
+    # 링크가 들어간 글은 건당 단가가 크게 붙어서, 하루 6회를 돌리면 매달 실비가 나간다.
+    # 그래서 돈을 쓰기로 결정하기 전까지는 이 작업을 건너뛴다.
+    #
+    # 켜려면: 저장소 Settings → Secrets and variables → Actions → Variables 탭에서
+    #         X_ENABLED = true 를 만들면 된다. (지우면 다시 꺼진다)
+    # 코드는 그대로 살아 있으므로 열쇠 4개와 이 변수만 있으면 바로 돈다.
+    if: vars.X_ENABLED == 'true'
     steps:
       - uses: actions/checkout@v4
 

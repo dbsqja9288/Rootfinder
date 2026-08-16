@@ -365,7 +365,34 @@ export const REGIONS: Record<string, Region> = {
   상당: { now: "충청북도 청주시 상당구", note: "청주의 옛 이름." },
 };
 
-export function getRegion(clanName: string): Region | null {
+/**
+ * 한글 이름은 같은데 실제로는 **다른 고을**인 본관들.
+ *
+ * 예) 광주 이씨의 광주는 廣州(경기도 광주)이고, 광주 노씨의 광주는 光州(전라도 광주)다.
+ * 한글만 보고 지역을 붙이면 둘 중 하나는 반드시 틀린다. 그래서 한자를 먼저 본다.
+ *
+ * 새 본관을 넣을 때 한글이 겹치면서 고을이 다르면 반드시 여기에도 추가할 것.
+ * `npm run check:regions` 로 빠진 게 없는지 확인할 수 있다.
+ */
+export const REGIONS_BY_HANJA: Record<string, Region> = {
+  廣州: { now: "경기도 광주시", note: "한강 남쪽의 옛 광주목. 전라도 광주(光州)와는 다른 고을이다." },
+  光州: { now: "광주광역시", note: "옛 이름은 광산(光山)·무진(武珍). 경기 광주(廣州)와는 다른 고을이다." },
+  英陽: { now: "경상북도 영양군" },
+  潁陽: { now: "중국 허난성 잉촨(潁川) 일대", note: "귀화 성씨가 중국의 옛 본향을 본관으로 삼은 경우." },
+  瑞山: { now: "충청남도 서산시" },
+};
+
+/**
+ * 본관의 현재 행정구역을 찾는다.
+ *
+ * 한자를 알면 한자를 먼저 본다. 동음이의 본관을 정확히 가르기 위해서다.
+ * 한자가 없는(해설이 없는) 본관은 한글 이름으로 찾는다.
+ */
+export function getRegion(clanName: string, hanja?: string): Region | null {
+  if (hanja) {
+    const byHanja = REGIONS_BY_HANJA[hanja.trim()];
+    if (byHanja) return byHanja;
+  }
   // "선산(일선)" 처럼 괄호가 붙은 경우 앞부분으로 조회
   const base = clanName.replace(/\(.*\)$/, "").trim();
   return REGIONS[base] ?? null;

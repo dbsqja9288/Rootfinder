@@ -213,7 +213,7 @@ export default async function MarketingPage({
       <section className="mb-10">
         <h2 className="serif mb-1 text-xl font-bold">자동 게시가 잘 돌고 있나</h2>
         <p className="mb-4 text-sm text-inksoft">
-          GitHub Actions 실행 이력입니다. 하루 6번, 스레드와 X가 각각 돕니다.
+          GitHub Actions 실행 이력입니다. 스레드에 하루 6번 올라갑니다. (X는 유료로 바뀌어 꺼둔 상태)
         </p>
         <div className="space-y-1.5">
           {actions.runs.map((r) => (
@@ -261,7 +261,7 @@ export default async function MarketingPage({
           <LinkCard
             href="https://analytics.x.com/"
             title="X 성적"
-            desc="X는 무료 등급이 글쓰기만 허용합니다. 노출·참여는 여기서."
+            desc="손으로 올린 글의 노출·참여. X는 API가 유료로 바뀌어 자동 게시를 꺼뒀습니다."
           />
           <LinkCard
             href="https://search.google.com/search-console"

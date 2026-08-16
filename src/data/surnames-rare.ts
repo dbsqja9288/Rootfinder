@@ -467,8 +467,8 @@ export const RARE_SURNAMES: Surname[] = [
     chosung: "ㅈ",
     population: 1800,
     rank: 111,
-    origin: "'참 진(眞)'으로 陳·秦과 다르다. 서산 진씨 단일 본관이며, 백제 대성팔족의 하나인 진씨와 연결짓는 기록이 있다.",
-    clans: [{ name: "서산 진씨", hanja: "西山", founder: "진호(眞護)", note: "백제 진씨와의 연결이 전한다.", population: 1700 }],
+    origin: "'참 진(眞)'으로 陳·秦과 다르다. 서산 진씨(瑞山) 단일 본관이다. 백제 대성팔족의 하나인 진씨와 연결짓는 이야기가 있으나, 시조와 계보는 전하지 않는다.",
+    clans: [{ name: "서산 진씨", hanja: "瑞山", founder: "미상", note: "시조와 계보가 전하지 않는다. 백제 진씨와의 연결은 추정일 뿐이다.", population: 1700 }],
   },
   {
     id: "seomun",

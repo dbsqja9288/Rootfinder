@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
 import HomeSearch from "@/components/HomeSearch";
+import JsonLd, { websiteSchema } from "@/components/JsonLd";
 
 export default function Home() {
   const top = SURNAMES.slice(0, 12);
 
   return (
     <div>
+      <JsonLd data={websiteSchema()} />
+
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">
         {/* 장식: 세대를 잇는 선과 낙관 */}

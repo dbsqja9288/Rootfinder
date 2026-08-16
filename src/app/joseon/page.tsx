@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import JoseonQuiz from "@/components/JoseonQuiz";
 import { JOSEON_DISCLAIMER, TIERS, TIER_ORDER } from "@/data/joseon";
 import TierArt from "@/components/TierArt";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "조선시대였다면 나는?",
@@ -12,8 +13,6 @@ export const metadata: Metadata = {
     description: "본관 + MBTI로 알아보는 조선시대 나의 가문과 직업",
   },
 };
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.vercel.app";
 
 export default function JoseonPage() {
   return (

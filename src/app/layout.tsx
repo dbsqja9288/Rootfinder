@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "한국인의 성씨와 본관, 시조의 유래를 찾아보고 나만의 가계도를 만들어보세요. 성씨 검색, 항렬 이야기, 역사 연대표까지.",
   keywords: ["족보", "성씨", "본관", "시조", "가계도", "항렬", "뿌리찾기"],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
     description: "성씨의 유래와 본관, 시조를 찾아보고 나만의 가계도를 만들어보세요.",
@@ -26,6 +27,17 @@ export const metadata: Metadata = {
     description: "성씨 123개, 본관 706개. 내 본관이 어디인지 찾아보세요.",
     images: ["/share-preview.png"],
   },
+  /**
+   * 검색엔진 소유확인.
+   * 콘솔에서 받은 코드를 Vercel 환경변수에 넣기만 하면 <head>에 붙는다.
+   * 값이 없으면 태그 자체가 나가지 않는다.
+   */
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_NAVER_VERIFICATION
+      ? { "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_VERIFICATION }
+      : {},
+  },
 };
 
 const NAV = [
@@ -34,6 +46,16 @@ const NAV = [
   { href: "/family-tree", label: "가계도 만들기" },
   { href: "/history", label: "역사 연대표" },
   { href: "/stories", label: "족보 이야기" },
+];
+
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+
+const FOOTER_LINKS = [
+  { href: "/about", label: "사이트 소개" },
+  { href: "/corrections", label: "정정 내역" },
+  { href: "/legal/privacy", label: "개인정보처리방침" },
+  { href: "/legal/terms", label: "이용약관" },
+  { href: "mailto:dbsqja9288@gmail.com", label: "문의하기" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -46,6 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* 애드센스 로더. 환경변수가 없으면 아예 나가지 않는다. */}
+        {ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className="antialiased">
         <div className="relative z-10 flex min-h-dvh flex-col">
@@ -90,6 +120,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 「조선시대였다면 나는?」은 재미를 위한 콘텐츠이며, 실제 신분·혈통·가치와 무관합니다. 수록 내용에 사실과
                 다른 부분이 있으면 위 메일로 알려주시면 확인 후 수정하겠습니다.
               </p>
+              <nav className="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-line pt-5 text-sm">
+                {FOOTER_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} className="transition hover:text-accent">
+                    {l.label}
+                  </Link>
+                ))}
+              </nav>
+
               <p className="mt-4 text-xs opacity-70">© {new Date().getFullYear()} 뿌리찾기</p>
             </div>
           </footer>

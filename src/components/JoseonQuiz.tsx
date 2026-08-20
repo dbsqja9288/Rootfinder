@@ -301,6 +301,17 @@ export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
               </Link>
             </div>
 
+            <p className="pt-1 text-center text-xs leading-relaxed text-inksoft">
+              재밌으셨다면{" "}
+              <Link href="/support" className="underline underline-offset-2 transition hover:text-accent">
+                만든 사람에게 커피 한 잔
+              </Link>{" "}
+              · 틀린 내용은{" "}
+              <Link href="/corrections" className="underline underline-offset-2 transition hover:text-accent">
+                여기로
+              </Link>
+            </p>
+
             {toast && (
               <p
                 role="status"

@@ -1,6 +1,7 @@
 import { CORE_SURNAMES } from "./surnames-core";
 import { MORE_SURNAMES } from "./surnames-more";
 import { RARE_SURNAMES } from "./surnames-rare";
+import { MISSING_SURNAMES } from "./surnames-missing";
 import { EXTRA_CLANS } from "./clans";
 import { stripSurnameSuffix } from "./surname-utils";
 import type { Surname } from "./types";
@@ -28,6 +29,7 @@ export const SURNAMES: Surname[] = merge([
   ...CORE_SURNAMES,
   ...MORE_SURNAMES,
   ...RARE_SURNAMES,
+  ...MISSING_SURNAMES,
 ]).sort((a, b) => a.rank - b.rank);
 
 export const CHOSUNG_LIST = ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];

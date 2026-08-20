@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
-    description: "성씨 123개, 본관 706개. 내 본관이 어디인지 찾아보세요.",
+    description: "성씨 141개, 본관 761개. 내 본관이 어디인지 찾아보세요.",
     images: ["/share-preview.png"],
   },
   /**
@@ -53,6 +53,7 @@ const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const FOOTER_LINKS = [
   { href: "/about", label: "사이트 소개" },
   { href: "/corrections", label: "정정 내역" },
+  { href: "/support", label: "후원하기" },
   { href: "/legal/privacy", label: "개인정보처리방침" },
   { href: "/legal/terms", label: "이용약관" },
   { href: "mailto:dbsqja9288@gmail.com", label: "문의하기" },
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
+        <link rel="alternate" type="application/rss+xml" title="뿌리찾기" href="/feed.xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

@@ -15,6 +15,7 @@ import DeepDive from "@/components/DeepDive";
 import JsonLd, { clanSchema, breadcrumbSchema } from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
 import ReportError from "@/components/ReportError";
+import { buildBrief } from "@/lib/clan-brief";
 
 export function generateStaticParams() {
   return CLAN_ENTRIES.map((c) => ({ id: c.surnameId, clan: c.slug }));
@@ -29,13 +30,20 @@ export async function generateMetadata({
   const entry = getClan(id, clan);
   if (!entry) return { title: "찾을 수 없는 본관" };
 
-  const where = entry.region ? ` 본관은 ${entry.region.now}입니다.` : "";
-  const founder = entry.detail ? ` 시조는 ${entry.detail.founder}입니다.` : "";
+  const where = entry.region ? ` ${entry.clanName}은 오늘날의 ${entry.region.now}입니다.` : "";
+
+  // 해설이 있는 본관과 없는 본관은 약속하는 내용이 달라야 한다.
+  // 시조 기록이 없는데 "시조와 유래"라고 걸어두면 검색으로 들어온 사람이 속았다고 느낀다.
+  const title = entry.detail ? `${entry.fullName} — 시조와 유래` : `${entry.fullName} — 본관은 어디인가`;
+  const description = entry.detail
+    ? `${entry.fullName}(${entry.surnameHanja})의 시조 ${entry.detail.founder}와 본관 지역, 인구를 정리했습니다.${where}`
+    : `${entry.fullName}(${entry.surnameHanja})는 어떤 본관인가.${where} 같은 성씨의 다른 본관과 함께 정리했습니다.`;
 
   return {
-    title: `${entry.fullName} — 시조와 유래`,
-    description: `${entry.fullName}(${entry.surnameHanja})의 시조, 본관 지역, 인구를 정리했습니다.${where}${founder}`,
-    openGraph: { title: `${entry.fullName} — 시조와 유래`, type: "article" },
+    title,
+    description,
+    alternates: { canonical: entry.href },
+    openGraph: { title, description, type: "article" },
   };
 }
 
@@ -53,6 +61,8 @@ export default async function ClanPage({
   const others = sameRegionClans(entry);
   const d = entry.detail;
   const patriots = getPatriots(entry.surnameId, entry.slug);
+  // 해설이 없는 본관은 확인된 사실만으로 요약을 만들어 빈 페이지가 되지 않게 한다
+  const brief = buildBrief(entry, surname);
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
@@ -146,16 +156,32 @@ export default async function ClanPage({
         {d?.note ? (
           <p className="leading-loose text-ink/90">{d.note}</p>
         ) : (
-          <div className="card p-5 text-sm leading-relaxed text-inksoft">
-            <p>
-              <strong className="text-ink">{entry.fullName}</strong>은 {entry.surnameKo}씨의 본관 가운데 하나로
-              전해집니다. 다만 이 본관에 대한 상세한 시조·세계(世系) 기록은 아직 이 사이트에 수록되지 않았습니다.
-            </p>
-            <p className="mt-3">
-              정확한 내용은 {entry.surnameKo}씨 대종회나 {entry.clanName} {entry.surnameKo}씨 종친회에 문의하시거나,
-              국립중앙도서관·한국학중앙연구원 장서각의 족보 자료를 확인하시는 것이 확실합니다.
-            </p>
-          </div>
+          <>
+            {/* 해설이 없는 본관은 확인된 사실만 조합해 요약을 만든다 */}
+            <div className="space-y-4 leading-loose text-ink/90">
+              {brief.paragraphs.map((t, i) => (
+                <p key={i}>{t}</p>
+              ))}
+            </div>
+
+            <div className="card mt-6 border-l-4 border-l-line p-5 text-sm leading-relaxed text-inksoft">
+              <p className="font-medium text-ink">이 본관에 대해 아직 확인하지 못한 것</p>
+              <ul className="mt-2 space-y-1">
+                {brief.unknowns.map((u) => (
+                  <li key={u} className="ml-4 list-disc">
+                    {u}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3">
+                확인되지 않은 내용을 지어내지 않고 비워둡니다. 정확한 내용은 {entry.surnameKo}씨 대종회나{" "}
+                {entry.clanName} {entry.surnameKo}씨 종친회, 또는 국립중앙도서관·한국학중앙연구원 장서각의 족보
+                자료에서 확인하실 수 있습니다.{" "}
+                <strong className="text-ink">알고 계신 내용이 있으면 아래로 알려주세요.</strong> 확인 후 채워
+                넣겠습니다.
+              </p>
+            </div>
+          </>
         )}
 
         {surname && (

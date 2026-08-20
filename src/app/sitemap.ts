@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/stories",
     "/about",
     "/corrections",
+    "/support",
     "/legal/privacy",
     "/legal/terms",
   ].map((p) => ({

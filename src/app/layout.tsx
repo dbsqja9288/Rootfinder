@@ -29,14 +29,17 @@ export const metadata: Metadata = {
   },
   /**
    * 검색엔진 소유확인.
-   * 콘솔에서 받은 코드를 Vercel 환경변수에 넣기만 하면 <head>에 붙는다.
-   * 값이 없으면 태그 자체가 나가지 않는다.
+   *
+   * 네이버는 메타태그 방식만 지원해서 값을 코드에 둔다. 공개돼도 무해한 값이다.
+   * 구글은 DNS TXT 레코드로 인증을 마쳤기 때문에 메타태그가 필요 없다.
+   * (다른 값으로 바꾸고 싶으면 환경변수를 넣으면 그쪽이 우선한다.)
    */
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
-    other: process.env.NEXT_PUBLIC_NAVER_VERIFICATION
-      ? { "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_VERIFICATION }
-      : {},
+    other: {
+      "naver-site-verification":
+        process.env.NEXT_PUBLIC_NAVER_VERIFICATION ?? "1766ae92f00d4b0f7f11ca5c09be341166bac2e4",
+    },
   },
 };
 

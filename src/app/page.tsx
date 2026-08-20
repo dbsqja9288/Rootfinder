@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
 import HomeSearch from "@/components/HomeSearch";
 import JsonLd, { websiteSchema } from "@/components/JsonLd";
+import AdSlot from "@/components/AdSlot";
 
 export default function Home() {
   const top = SURNAMES.slice(0, 12);
@@ -157,6 +158,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <AdSlot />
     </div>
   );
 }

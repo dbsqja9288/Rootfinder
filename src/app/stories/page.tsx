@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ARTICLES } from "@/data/timeline";
 import ChonsuCalculator from "@/components/ChonsuCalculator";
+import AdSlot from "@/components/AdSlot";
 
 export const metadata: Metadata = {
   title: "족보 이야기",
@@ -58,6 +59,8 @@ export default function StoriesPage() {
             <ChonsuCalculator />
           </div>
         </section>
+
+      <AdSlot />
       </div>
     </div>
   );

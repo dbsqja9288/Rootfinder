@@ -5,6 +5,7 @@ import { SURNAMES, getSurname, CLAN_DISCLAIMER } from "@/data/surnames";
 import ClanList from "@/components/ClanList";
 import DeepDive from "@/components/DeepDive";
 import { isDeepDiveEnabled } from "@/lib/ai";
+import AdSlot from "@/components/AdSlot";
 
 export function generateStaticParams() {
   return SURNAMES.map((s) => ({ id: s.id }));
@@ -165,6 +166,8 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
           가계도 만들기
         </Link>
       </section>
+
+      <AdSlot />
 
       {/* 이전/다음 */}
       <nav className="mt-10 flex justify-between gap-4 border-t border-line pt-6 text-sm">

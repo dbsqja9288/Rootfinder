@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ERAS } from "@/data/timeline";
+import AdSlot from "@/components/AdSlot";
 
 export const metadata: Metadata = {
   title: "역사 연대표",
@@ -44,6 +45,8 @@ export default function HistoryPage() {
           ))}
         </ol>
       </div>
+
+      <AdSlot />
     </div>
   );
 }

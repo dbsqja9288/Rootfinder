@@ -3,6 +3,7 @@ import JoseonQuiz from "@/components/JoseonQuiz";
 import { JOSEON_DISCLAIMER, TIERS, TIER_ORDER } from "@/data/joseon";
 import TierArt from "@/components/TierArt";
 import { SITE_URL } from "@/lib/site";
+import AdSlot from "@/components/AdSlot";
 
 export const metadata: Metadata = {
   title: "조선시대였다면 나는?",
@@ -77,6 +78,8 @@ export default function JoseonPage() {
           </ul>
         </div>
       </section>
+
+      <AdSlot />
     </div>
   );
 }

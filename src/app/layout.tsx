@@ -37,8 +37,14 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
     other: {
-      "naver-site-verification":
-        process.env.NEXT_PUBLIC_NAVER_VERIFICATION ?? "1766ae92f00d4b0f7f11ca5c09be341166bac2e4",
+      // 네이버는 사이트 항목마다 다른 코드를 준다(www 유무만 달라도 새 코드).
+      // 둘 다 내보내면 어느 항목에서 확인을 눌러도 통과한다. 태그가 하나 더 나가는 것 말고는 부담이 없다.
+      "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_VERIFICATION
+        ? [process.env.NEXT_PUBLIC_NAVER_VERIFICATION]
+        : [
+            "bfe39e669da1f0c9491b751570e2b479ff7c7d7c", // https://rootfinder.kr  ← 지금 쓰는 것
+            "1766ae92f00d4b0f7f11ca5c09be341166bac2e4", // 이전 등록분
+          ],
     },
   },
 };

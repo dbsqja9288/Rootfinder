@@ -79,7 +79,7 @@ export default function SupportPage() {
           <li className="card p-4 text-sm leading-relaxed">
             <strong>틀린 내용을 알려주세요.</strong> 각 본관 페이지 아래 &lsquo;잘못된 정보 알려주기&rsquo;
             버튼이 있습니다. 실제로 이 제보들로 여러 건을 바로잡았습니다.{" "}
-            <Link href="/corrections" className="text-accent underline underline-offset-2">
+            <Link prefetch={false} href="/corrections" className="text-accent underline underline-offset-2">
               정정 내역
             </Link>
             에서 보실 수 있습니다.

@@ -85,11 +85,11 @@ export default async function ClanPage({
 
       {/* 빵부스러기 */}
       <nav className="flex flex-wrap items-center gap-1.5 text-sm text-inksoft">
-        <Link href="/surnames" className="transition hover:text-accent">
+        <Link prefetch={false} href="/surnames" className="transition hover:text-accent">
           성씨 찾기
         </Link>
         <span>›</span>
-        <Link href={`/surnames/${entry.surnameId}`} className="transition hover:text-accent">
+        <Link prefetch={false} href={`/surnames/${entry.surnameId}`} className="transition hover:text-accent">
           {entry.surnameKo}씨
         </Link>
         <span>›</span>
@@ -239,7 +239,7 @@ export default async function ClanPage({
           <h3 className="serif font-bold">조선시대였다면 {entry.fullName}는 어떤 가문이었을까?</h3>
           <p className="mt-1 text-sm text-inksoft">MBTI까지 고르면 내 직업도 나옵니다 · 재미로 보는 콘텐츠</p>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/joseon"
           className="rounded-xl bg-accent px-5 py-2.5 font-medium text-white transition hover:opacity-90 dark:text-stone-900"
         >
@@ -257,7 +257,7 @@ export default async function ClanPage({
           <ul className="flex flex-wrap gap-2">
             {others.map((o) => (
               <li key={o.href}>
-                <Link
+                <Link prefetch={false}
                   href={o.href}
                   className="inline-flex items-center gap-2 rounded-lg border border-line bg-elev px-3 py-1.5 text-sm transition hover:border-accent hover:text-accent"
                 >
@@ -280,7 +280,7 @@ export default async function ClanPage({
           <ul className="flex flex-wrap gap-1.5">
             {siblings.map((s) => (
               <li key={s.href}>
-                <Link
+                <Link prefetch={false}
                   href={s.href}
                   className={`inline-block rounded-lg px-2.5 py-1 text-sm transition hover:border-accent hover:text-accent ${
                     s.detail
@@ -303,7 +303,7 @@ export default async function ClanPage({
           <h3 className="serif font-bold">{entry.fullName} 가계도를 만들어볼까요?</h3>
           <p className="mt-1 text-sm text-inksoft">시조부터 나까지, 한 장의 그림으로 정리해 드립니다.</p>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/family-tree"
           className="rounded-xl bg-accent px-5 py-2.5 font-medium text-white transition hover:opacity-90 dark:text-stone-900"
         >

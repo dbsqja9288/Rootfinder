@@ -67,7 +67,7 @@ export default function Home() {
             <div className="mt-6 flex flex-wrap gap-2 text-sm">
               <span className="text-inksoft">인기 검색:</span>
               {["김", "이", "박", "최", "정"].map((k) => (
-                <Link
+                <Link prefetch={false}
                   key={k}
                   href={`/surnames?q=${encodeURIComponent(k)}`}
                   className="rounded-full border border-line px-3 py-0.5 transition hover:border-accent hover:text-accent"
@@ -87,14 +87,14 @@ export default function Home() {
             <h2 className="serif text-2xl font-bold sm:text-3xl">인구가 많은 성씨</h2>
             <p className="mt-1 text-sm text-inksoft">2015년 인구주택총조사 기준</p>
           </div>
-          <Link href="/surnames" className="text-sm text-accent hover:underline">
+          <Link prefetch={false} href="/surnames" className="text-sm text-accent hover:underline">
             전체 보기 →
           </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {top.map((s) => (
-            <Link
+            <Link prefetch={false}
               key={s.id}
               href={`/surnames/${s.id}`}
               className="card group flex items-center gap-4 p-4 transition hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg"
@@ -142,7 +142,7 @@ export default function Home() {
               desc: "대동보와 파보의 차이, 항렬자 읽는 법, 촌수 계산법까지. 족보를 처음 보는 사람을 위한 안내.",
             },
           ].map((f) => (
-            <Link
+            <Link prefetch={false}
               key={f.href}
               href={f.href}
               className="card group p-6 transition hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg"

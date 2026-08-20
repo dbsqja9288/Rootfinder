@@ -57,7 +57,7 @@ export default function CorrectionsPage() {
             <p className="mt-4 border-t border-line pt-4 text-sm leading-relaxed text-inksoft">{c.reason}</p>
 
             {c.href && (
-              <Link
+              <Link prefetch={false}
                 href={c.href}
                 className="mt-3 inline-block text-sm text-accent underline underline-offset-2"
               >

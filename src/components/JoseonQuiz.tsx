@@ -293,7 +293,7 @@ export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
               >
                 {saving ? "만드는 중…" : "이미지 저장"}
               </button>
-              <Link
+              <Link prefetch={false}
                 href={result.clan.href}
                 className="rounded-xl border border-line px-4 py-3 text-center transition hover:border-accent hover:text-accent"
               >
@@ -303,11 +303,11 @@ export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
 
             <p className="pt-1 text-center text-xs leading-relaxed text-inksoft">
               재밌으셨다면{" "}
-              <Link href="/support" className="underline underline-offset-2 transition hover:text-accent">
+              <Link prefetch={false} href="/support" className="underline underline-offset-2 transition hover:text-accent">
                 만든 사람에게 커피 한 잔
               </Link>{" "}
               · 틀린 내용은{" "}
-              <Link href="/corrections" className="underline underline-offset-2 transition hover:text-accent">
+              <Link prefetch={false} href="/corrections" className="underline underline-offset-2 transition hover:text-accent">
                 여기로
               </Link>
             </p>

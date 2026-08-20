@@ -97,7 +97,7 @@ export default function AboutPage() {
 
 function NavCard({ href, title, desc }: { href: string; title: string; desc: string }) {
   return (
-    <Link href={href} className="card p-4 transition hover:border-accent">
+    <Link prefetch={false} href={href} className="card p-4 transition hover:border-accent">
       <p className="serif font-bold">{title}</p>
       <p className="mt-1 text-sm text-inksoft">{desc}</p>
     </Link>

@@ -36,7 +36,7 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
-      <Link href="/surnames" className="text-sm text-inksoft transition hover:text-accent">
+      <Link prefetch={false} href="/surnames" className="text-sm text-inksoft transition hover:text-accent">
         ← 성씨 목록
       </Link>
 
@@ -158,7 +158,7 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
           <h3 className="serif font-bold">{s.ko}씨 가계도를 만들어볼까요?</h3>
           <p className="mt-1 text-sm text-inksoft">가족을 입력하면 한 장의 그림으로 정리해 드립니다.</p>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/family-tree"
           className="rounded-xl bg-accent px-5 py-2.5 font-medium text-white transition hover:opacity-90 dark:text-stone-900"
         >
@@ -169,14 +169,14 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
       {/* 이전/다음 */}
       <nav className="mt-10 flex justify-between gap-4 border-t border-line pt-6 text-sm">
         {prev ? (
-          <Link href={`/surnames/${prev.id}`} className="text-inksoft transition hover:text-accent">
+          <Link prefetch={false} href={`/surnames/${prev.id}`} className="text-inksoft transition hover:text-accent">
             ← {prev.ko}씨 ({prev.hanja})
           </Link>
         ) : (
           <span />
         )}
         {next && (
-          <Link href={`/surnames/${next.id}`} className="text-inksoft transition hover:text-accent">
+          <Link prefetch={false} href={`/surnames/${next.id}`} className="text-inksoft transition hover:text-accent">
             {next.ko}씨 ({next.hanja}) →
           </Link>
         )}

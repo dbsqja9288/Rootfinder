@@ -121,7 +121,7 @@ export default function SurnameBrowser({
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {surnameHits.map(({ surname: s, reason, detail }) => (
             <li key={s.id}>
-              <Link
+              <Link prefetch={false}
                 href={`/surnames/${s.id}`}
                 className="card block h-full p-5 transition hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg"
               >
@@ -160,7 +160,7 @@ export default function SurnameBrowser({
 
 function ClanCard({ clan }: { clan: ClanEntry }) {
   return (
-    <Link
+    <Link prefetch={false}
       href={clan.href}
       className="card flex h-full items-start gap-3 p-4 transition hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg"
     >

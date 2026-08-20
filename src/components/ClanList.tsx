@@ -47,7 +47,7 @@ export default function ClanList({
       <ul className="flex flex-wrap gap-1.5">
         {visible.map((c) => (
           <li key={c}>
-            <Link
+            <Link prefetch={false}
               href={`/surnames/${surnameId}/${encodeURIComponent(c.replace(/\(.*\)$/, "").trim())}`}
               className={`inline-block rounded-lg px-2.5 py-1 text-sm transition hover:border-accent hover:text-accent ${
                 detailedSet.has(c)

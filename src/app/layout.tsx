@@ -95,12 +95,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10 flex min-h-dvh flex-col">
           <header className="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md">
             <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3.5 sm:gap-6">
-              <Link href="/" className="serif shrink-0 text-lg font-bold tracking-tight sm:text-xl">
+              <Link prefetch={false} href="/" className="serif shrink-0 text-lg font-bold tracking-tight sm:text-xl">
                 <span className="text-accent">뿌리</span>찾기
               </Link>
               <nav className="flex flex-1 items-center gap-1 overflow-x-auto text-sm sm:gap-2">
                 {NAV.map((n) => (
-                  <Link
+                  <Link prefetch={false}
                     key={n.href}
                     href={n.href}
                     className="shrink-0 rounded-full px-3 py-1.5 text-inksoft transition hover:bg-line/60 hover:text-ink"
@@ -136,7 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </p>
               <nav className="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-line pt-5 text-sm">
                 {FOOTER_LINKS.map((l) => (
-                  <Link key={l.href} href={l.href} className="transition hover:text-accent">
+                  <Link prefetch={false} key={l.href} href={l.href} className="transition hover:text-accent">
                     {l.label}
                   </Link>
                 ))}

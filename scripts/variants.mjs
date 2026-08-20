@@ -9,7 +9,7 @@
  * └──────────────────────────────────────────────────┘
  */
 
-export const SITE = (process.env.SITE_URL ?? "https://rootfinder-pi.vercel.app").replace(/\/$/, "");
+export const SITE = (process.env.SITE_URL ?? "https://rootfinder.kr").replace(/\/$/, "");
 
 /** ★ 여기만 바꾸면 A 소재가 통째로 교체된다 */
 const A_PICK = "질문";

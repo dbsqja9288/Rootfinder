@@ -24,12 +24,35 @@ export const SITE = (process.env.SITE_URL ?? "https://rootfinder.kr").replace(/\
 const A_PICK = "rotate";
 
 /**
+ * ★★ A 소재의 "각도" — 스레드에서 어느 토픽에 얹힐지가 여기서 갈린다.
+ *
+ *   "mbti"   → MBTI 이야기로 풀고 #MBTI 토픽에 얹는다 (기본값)
+ *   "joseon" → 조선시대 신분으로 풀고 #조선시대 토픽에 얹는다 (예전 방식)
+ *
+ * 스레드는 게시물에 붙은 해시태그 하나를 그대로 토픽으로 잡는다.
+ * 그래서 태그만 바꾸면 안 되고 본문도 그 토픽에 맞아야 한다.
+ * #MBTI를 달아놓고 MBTI 얘기가 없으면 그 토픽 독자에게는 그냥 광고로 읽힌다.
+ * 두 값 모두 같은 /joseon 페이지로 보내므로 대시보드의 A/B 집계는 그대로 유지된다.
+ */
+const A_ANGLE = "joseon";
+
+/**
+ * ★★★ A 게시물에 붙일 토픽 태그.
+ *
+ * 각도(A_ANGLE)와 따로 논다. 문구는 조선시대로 두고 태그만 #MBTI로 다는 것이 지금 설정이다.
+ * /joseon 페이지가 실제로 MBTI를 입력받는 콘텐츠라 태그와 내용이 어긋나지 않는다.
+ *   "#MBTI"    → 모수가 큰 토픽. 지금 이것.
+ *   "#조선시대" → 예전 설정. 모수는 작지만 문구와 정확히 맞는다.
+ */
+const A_TAG_OVERRIDE = "#MBTI";
+
+/**
  * A 소재 후보들 — 조선시대 신분 확인이 미끼다.
  *
  * 톤은 전부 "광고가 아니라 그냥 해보고 신기해서 올린 글"에 맞췄다.
  * 짧은 줄, ㅋㅋ, 존댓말 없음. 광고 같아 보이는 순간 스크롤로 넘어간다.
  */
-const A_VERSIONS = {
+const A_VERSIONS_JOSEON = {
   // 몰랐던 사실로 끌고, 신분 소재의 거부감도 같이 눌러준다
   천민없는이유: `조선시대 신분 알려주는 사이트 해봤는데
 천민 등급이 없길래 왜지 했더니
@@ -81,6 +104,71 @@ const A_VERSIONS = {
 다들 해보셈`,
 };
 
+
+/**
+ * A 소재 — MBTI 각도. 미끼는 "내 MBTI가 조선시대에 뭘 하고 살았나"다.
+ *
+ * 등장하는 직업은 전부 실제로 그 MBTI에서 나오는 결과다. 지어낸 것이 없다.
+ *   ENFP·양인 → 전기수 (저잣거리 이야기꾼)
+ *   ESFP·양인 → 남사당 광대
+ *   ISTP·양인 → 대장장이
+ *   ESFJ·향반 → 종가 종부
+ * 해보고 결과가 다르다는 반응이 나오면 신뢰가 깎이니 이 선은 지킨다.
+ */
+const A_VERSIONS_MBTI = {
+  // 가장 직관적인 미끼. MBTI 토픽 독자가 바로 알아본다
+  직업: `MBTI 넣으면 조선시대에 뭐 하고 살았을지 알려주는거 해봤는데
+나 ISTP인데 대장장이 나옴 ㅋㅋㅋㅋ
+
+본관이랑 MBTI 두개만 고르면 됨
+너무 정확해서 좀 기분나쁨`,
+
+  // 기대와 다른 결과 → 읽는 재미
+  반전: `ENFP라 광대같은거 나올줄 알았는데
+전기수 나옴
+
+저잣거리에서 소설 읽어주다가
+제일 중요한 대목에서 딱 멈추고 돈 걷던 사람이래 ㅋㅋㅋ
+
+ENFP 맞긴하네`,
+
+  // 대놓고 물어본다. MBTI 토픽에서 댓글이 제일 잘 붙는 형식
+  질문: `님들 MBTI랑 본관 넣으면
+조선시대에 뭐 하고 살았을지 나오는거 앎?
+
+나는 전기수 나옴 (저잣거리 이야기꾼)
+16개 다 직업이 다르다는데
+
+다들 뭐 나옴?`,
+
+  // MBTI로 들어와서 족보를 보고 나가는 흐름 자체를 소재로
+  덤: `MBTI 테스트인줄 알고 들어갔는데
+직업만 나오는게 아니라
+
+우리 집안이 조선시대 기준
+상위 몇퍼센트였는지까지 같이 나옴 ㅋㅋ
+
+MBTI 하나 골랐다가 갑자기 족보 봄`,
+
+  // 가족을 끌어들이면 공유가 붙는다
+  가족: `엄마 MBTI 물어보고 본관 넣어봤는데
+종가 종부 나옴
+
+제사랑 손님 접대 총괄하는 자리라니까
+엄마가 어이없어하면서도 인정함 ㅋㅋㅋ`,
+
+  // 스크롤 중에 눈에 걸리는 용도. 제일 짧게
+  짧게: `MBTI랑 본관 넣으면
+조선시대에 뭐 하고 살았을지 나옴
+
+나 남사당 광대 나왔음 ㅋㅋㅋ
+다들 해보셈`,
+};
+
+/** 지금 쓰는 A 소재 묶음과 거기 붙일 토픽 태그. */
+const A_BANK = A_ANGLE === "joseon" ? A_VERSIONS_JOSEON : A_VERSIONS_MBTI;
+const A_TAG = A_TAG_OVERRIDE ?? (A_ANGLE === "joseon" ? "#조선시대" : "#MBTI");
+
 /**
  * 예약된 실행 시각(UTC). 한국시간 -9시간. 하루 18회.
  *
@@ -124,14 +212,14 @@ export function pickVariant() {
 /** A 문구 고르기. rotate면 날짜+슬롯으로 돌려서 같은 날 같은 문장이 안 겹치게 한다. */
 function pickAText() {
   const forced = process.env.A_VERSION;
-  if (forced && A_VERSIONS[forced]) return A_VERSIONS[forced];
-  if (A_PICK !== "rotate") return A_VERSIONS[A_PICK] ?? A_VERSIONS["질문"];
+  if (forced && A_BANK[forced]) return A_BANK[forced];
+  if (A_PICK !== "rotate") return A_BANK[A_PICK] ?? A_BANK["질문"];
 
-  const names = Object.keys(A_VERSIONS);
+  const names = Object.keys(A_BANK);
   const day = Math.floor(Date.now() / 86400000);
   // 슬롯 순서를 2로 나눈 값 = 그날 A가 몇 번째로 나가는지
   const nth = Math.floor(slotIndex() / 2);
-  return A_VERSIONS[names[(day + nth) % names.length]];
+  return A_BANK[names[(day + nth) % names.length]];
 }
 
 const aText = pickAText();
@@ -200,7 +288,7 @@ export const VARIANTS = {
     text: `${aText}
 
 ${SITE}/joseon
-#조선시대`,
+${A_TAG}`,
     textX: `${aText}
 
 ${SITE}/joseon`,

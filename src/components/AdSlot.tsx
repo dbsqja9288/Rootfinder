@@ -19,6 +19,13 @@ const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const ADSENSE_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT;
 const ADFIT_UNIT = process.env.NEXT_PUBLIC_ADFIT_UNIT;
 
+/**
+ * 애드핏은 광고단위마다 크기가 고정이다. 만든 단위의 크기와 여기가 다르면 광고가 안 나온다.
+ * 기본값 300x250은 본문 안에 넣기에 무난하고 모바일·PC 양쪽에서 잘 보이는 크기다.
+ */
+const ADFIT_W = process.env.NEXT_PUBLIC_ADFIT_WIDTH ?? "300";
+const ADFIT_H = process.env.NEXT_PUBLIC_ADFIT_HEIGHT ?? "250";
+
 export const ADS_ENABLED = Boolean((ADSENSE_CLIENT && ADSENSE_SLOT) || ADFIT_UNIT);
 
 export default function AdSlot({ className = "" }: { className?: string }) {
@@ -81,12 +88,14 @@ function AdFit({ className }: { className?: string }) {
     ins.className = "kakao_ad_area";
     ins.style.display = "none";
     ins.setAttribute("data-ad-unit", ADFIT_UNIT!);
-    ins.setAttribute("data-ad-width", "320");
-    ins.setAttribute("data-ad-height", "100");
+    ins.setAttribute("data-ad-width", ADFIT_W);
+    ins.setAttribute("data-ad-height", ADFIT_H);
 
     const s = document.createElement("script");
     s.async = true;
-    s.src = "//t1.daumcdn.net/kas/static/ba.min.js";
+    // 카카오가 현재 안내하는 주소. 예전 t1.daumcdn.net도 동작하지만
+    // 콘솔이 주는 스니펫과 맞춰두는 편이 나중에 바뀔 때 덜 헷갈린다.
+    s.src = "//t1.kakaocdn.net/kas/static/ba.min.js";
 
     box.current.append(ins, s);
   }, []);

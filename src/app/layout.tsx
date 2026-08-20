@@ -4,6 +4,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+
 export const metadata: Metadata = {
   title: {
     default: "뿌리찾기 — 나의 성씨와 가계를 찾아서",
@@ -45,6 +47,9 @@ export const metadata: Metadata = {
             "bfe39e669da1f0c9491b751570e2b479ff7c7d7c", // https://rootfinder.kr  ← 지금 쓰는 것
             "1766ae92f00d4b0f7f11ca5c09be341166bac2e4", // 이전 등록분
           ],
+      // 애드센스 소유권 확인의 세 번째 방법(메타 태그).
+      // 스크립트·ads.txt 방식이 막힐 때를 대비해 함께 내보낸다.
+      ...(ADSENSE_CLIENT ? { "google-adsense-account": ADSENSE_CLIENT } : {}),
     },
   },
 };
@@ -56,8 +61,6 @@ const NAV = [
   { href: "/history", label: "역사 연대표" },
   { href: "/stories", label: "족보 이야기" },
 ];
-
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 const FOOTER_LINKS = [
   { href: "/about", label: "사이트 소개" },

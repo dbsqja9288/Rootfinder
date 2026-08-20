@@ -22,9 +22,9 @@ export function GET() {
   // ca-pub-0000000000000000 → pub-0000000000000000
   const pub = client.replace(/^ca-/, "");
 
-  const body = `# 이 사이트의 광고를 판매할 권한이 있는 곳
-google.com, ${pub}, DIRECT, ${GOOGLE_TAG_ID}
-`;
+  // 주석 없이 순수 레코드만 내보낸다.
+  // 한글 주석이 들어가면 일부 파서가 파일 전체를 못 읽는 경우가 있다.
+  const body = `google.com, ${pub}, DIRECT, ${GOOGLE_TAG_ID}\n`;
 
   return new Response(body, {
     headers: {

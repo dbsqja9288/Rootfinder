@@ -61,7 +61,7 @@ export default async function MarketingPage({
     );
   }
 
-  const [threads, actions] = await Promise.all([loadThreads(30), loadRuns(12)]);
+  const [threads, actions] = await Promise.all([loadThreads(30), loadRuns(24)]);
   const stats = summarize(threads.posts);
   const winner =
     stats[0].count && stats[1].count
@@ -213,7 +213,7 @@ export default async function MarketingPage({
       <section className="mb-10">
         <h2 className="serif mb-1 text-xl font-bold">자동 게시가 잘 돌고 있나</h2>
         <p className="mb-4 text-sm text-inksoft">
-          GitHub Actions 실행 이력입니다. 스레드에 하루 6번 올라갑니다. (X는 유료로 바뀌어 꺼둔 상태)
+          GitHub Actions 실행 이력입니다. 스레드에 하루 12번 올라갑니다. (X는 유료로 바뀌어 꺼둔 상태)
         </p>
         <div className="space-y-1.5">
           {actions.runs.map((r) => (

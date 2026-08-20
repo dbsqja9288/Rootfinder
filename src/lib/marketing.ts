@@ -8,14 +8,21 @@
 
 const API = "https://graph.threads.net/v1.0";
 
-/** 어떤 소재로 올린 글인지 본문으로 되짚는다. scripts/variants.mjs와 짝을 이룬다. */
-export const VARIANT_SIGNS: { key: "A" | "B"; label: string; needle: string }[] = [
-  { key: "A", label: "MBTI 자극", needle: "삼도수군통제사" },
-  { key: "B", label: "정보 욕구", needle: "상위 몇퍼센트" },
+/**
+ * 어떤 소재로 올린 글인지 되짚는다. scripts/variants.mjs와 짝을 이룬다.
+ *
+ * 문구는 여러 개를 돌려쓰기 때문에 특정 단어로 구분할 수 없다.
+ * 대신 **링크 주소**로 가른다. A는 항상 /joseon 으로, B는 홈으로 보낸다.
+ * 문구를 바꿔도 이 규칙은 깨지지 않는다.
+ */
+export const VARIANT_SIGNS: { key: "A" | "B"; label: string }[] = [
+  { key: "A", label: "신분 자극" },
+  { key: "B", label: "정보 욕구" },
 ];
 
 export function variantOf(text: string): "A" | "B" | null {
-  return VARIANT_SIGNS.find((v) => text.includes(v.needle))?.key ?? null;
+  if (!text.includes("rootfinder")) return null; // 우리가 올린 글이 아님
+  return text.includes("/joseon") ? "A" : "B";
 }
 
 export type ThreadPost = {

@@ -114,6 +114,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 본문 중간 광고. 인기 성씨를 훑고 난 자리. */}
+      <AdSlot slot={2} />
+
       {/* 3 features */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

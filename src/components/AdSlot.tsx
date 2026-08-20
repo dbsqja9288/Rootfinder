@@ -35,11 +35,29 @@ const ADFIT_UNITS: Record<number, string | undefined> = {
 };
 
 /**
- * 애드핏은 광고단위마다 크기가 고정이다. 만든 단위의 크기와 여기가 다르면 광고가 안 나온다.
- * 기본값 300x250은 본문 안에 넣기에 무난하고 모바일·PC 양쪽에서 잘 보이는 크기다.
+ * 애드핏은 **한 매체 안에 같은 크기의 광고단위를 두 번 만들 수 없다.**
+ * ("해당 매체에 중복된 광고단위가 존재합니다" 에러가 이것이다.)
+ * 그래서 자리마다 크기가 달라야 하고, 크기도 자리별로 따로 잡는다.
+ *
+ * 만든 광고단위의 크기와 여기 값이 다르면 광고가 아예 안 나온다. 반드시 맞출 것.
+ *   1번(하단)  = 300x250  ← 기본값
+ *   2번(본문 중간) = 320x100  ← 기본값(실제로 만든 단위 크기와 같다).
+ *                    다른 크기로 만들었으면 환경변수로 바꾼다.
+ *     NEXT_PUBLIC_ADFIT_SIZE_2 = "336x280" 처럼 넣으면 그 값이 우선한다.
  */
-const ADFIT_W = process.env.NEXT_PUBLIC_ADFIT_WIDTH ?? "300";
-const ADFIT_H = process.env.NEXT_PUBLIC_ADFIT_HEIGHT ?? "250";
+function size(raw: string | undefined, fallback: [string, string]): [string, string] {
+  const m = raw?.trim().match(/^(\d+)\s*[xX*]\s*(\d+)$/);
+  return m ? [m[1], m[2]] : fallback;
+}
+
+const ADFIT_SIZES: Record<number, [string, string]> = {
+  1: size(
+    process.env.NEXT_PUBLIC_ADFIT_SIZE,
+    [process.env.NEXT_PUBLIC_ADFIT_WIDTH ?? "300", process.env.NEXT_PUBLIC_ADFIT_HEIGHT ?? "250"],
+  ),
+  2: size(process.env.NEXT_PUBLIC_ADFIT_SIZE_2, ["320", "100"]),
+  3: size(process.env.NEXT_PUBLIC_ADFIT_SIZE_3, ["320", "100"]),
+};
 
 export const ADS_ENABLED = Boolean((ADSENSE_CLIENT && ADSENSE_SLOT) || ADFIT_UNITS[1]);
 
@@ -53,7 +71,8 @@ export default function AdSlot({ className = "", slot = 1 }: { className?: strin
   }
   const unit = ADFIT_UNITS[slot];
   if (unit) {
-    return <AdFit className={className} unit={unit} />;
+    const [w, h] = ADFIT_SIZES[slot] ?? ADFIT_SIZES[1];
+    return <AdFit className={className} unit={unit} w={w} h={h} />;
   }
   return null;
 }
@@ -96,7 +115,7 @@ function AdSense({ className }: { className?: string }) {
   );
 }
 
-function AdFit({ className, unit }: { className?: string; unit: string }) {
+function AdFit({ className, unit, w, h }: { className?: string; unit: string; w: string; h: string }) {
   const box = useRef<HTMLDivElement>(null);
   const loaded = useRef(false);
 
@@ -108,8 +127,8 @@ function AdFit({ className, unit }: { className?: string; unit: string }) {
     ins.className = "kakao_ad_area";
     ins.style.display = "none";
     ins.setAttribute("data-ad-unit", unit);
-    ins.setAttribute("data-ad-width", ADFIT_W);
-    ins.setAttribute("data-ad-height", ADFIT_H);
+    ins.setAttribute("data-ad-width", w);
+    ins.setAttribute("data-ad-height", h);
 
     const s = document.createElement("script");
     s.async = true;
@@ -118,7 +137,7 @@ function AdFit({ className, unit }: { className?: string; unit: string }) {
     s.src = "//t1.kakaocdn.net/kas/static/ba.min.js";
 
     box.current.append(ins, s);
-  }, [unit]);
+  }, [unit, w, h]);
 
   return (
     <Frame className={className}>

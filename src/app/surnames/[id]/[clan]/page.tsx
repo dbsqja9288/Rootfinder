@@ -150,6 +150,9 @@ export default async function ClanPage({
         </section>
       )}
 
+      {/* 본문 중간 광고. 지역 해설을 읽고 다음 단락으로 넘어가는 자연스러운 쉼표 자리다. */}
+      <AdSlot slot={2} />
+
       {/* 이 본관 이야기 */}
       <section className="mt-10">
         <h2 className="serif mb-3 text-xl font-bold">{entry.fullName} 이야기</h2>

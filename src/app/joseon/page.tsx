@@ -62,9 +62,6 @@ export default function JoseonPage() {
         </div>
       </section>
 
-      {/* 본문 중간 광고. 공유 버튼과 멀리 떨어뜨려 실수 클릭을 막는다. */}
-      <AdSlot slot={2} />
-
       {/* 면책 */}
       <section className="mt-12">
         <div className="card border-l-4 border-l-accent p-6">

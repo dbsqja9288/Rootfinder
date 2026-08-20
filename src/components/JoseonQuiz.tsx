@@ -6,6 +6,7 @@ import { MBTI_LIST, type Mbti } from "@/data/joseon";
 import { searchClans, type ClanEntry } from "@/lib/clan-index";
 import { judge } from "@/lib/joseon";
 import TierArt from "./TierArt";
+import AdSlot from "./AdSlot";
 
 export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
   const [q, setQ] = useState("");
@@ -190,6 +191,19 @@ export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
       {/* 결과 */}
       {result && (
         <>
+          {/*
+            결과 바로 앞 광고.
+            여기가 이 사이트에서 사람이 가장 확실하게 지나가는 길목이다.
+            다만 위쪽 MBTI 버튼과는 충분히 떨어뜨려 둔다 — 버튼을 누르려다 광고를 잘못 누르면
+            애드핏/애드센스 양쪽 다 무효 클릭으로 잡고, 쌓이면 계정이 정지된다.
+          */}
+          <div className="pt-4">
+            <AdSlot slot={2} className="!mt-2 !mb-4" />
+            <p className="fade-up text-center text-sm text-inksoft">
+              결과는 바로 아래에 있습니다 <span aria-hidden>↓</span>
+            </p>
+          </div>
+
           <div ref={cardRef} className="card fade-up overflow-hidden p-8 text-center">
             <div className="flex justify-center">
               <TierArt tier={result.tier.id} size={140} />

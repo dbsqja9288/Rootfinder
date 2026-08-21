@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
+import AdSlot from "@/components/AdSlot";
 import "./globals.css";
 
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -111,6 +112,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
             </div>
           </header>
+
+          {/*
+            모든 화면 최상단 띠 광고(3번 자리).
+            레이아웃에 두면 페이지를 새로 만들어도 자동으로 따라붙는다.
+            내비게이션 바로 아래라 상단 메뉴와 붙지 않게 위아래로 띄웠고,
+            높이 50px짜리 작은 배너라 본문을 아래로 크게 밀지 않는다.
+          */}
+          <div className="mx-auto w-full max-w-6xl px-4">
+            <AdSlot slot={3} className="!mt-4 !mb-2" />
+          </div>
 
           <main className="flex-1">{children}</main>
 

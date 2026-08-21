@@ -150,8 +150,15 @@ export default async function ClanPage({
         </section>
       )}
 
-      {/* 본문 중간 광고. 지역 해설을 읽고 다음 단락으로 넘어가는 자연스러운 쉼표 자리다. */}
-      <AdSlot slot={2} />
+      {/*
+        본문 중간 광고.
+        시조·유래 기록이 있는 본관에서만 내보낸다.
+        기록이 없는 본관은 본문이 짧아서, 여기에 광고를 하나 더 얹으면
+        "콘텐츠보다 광고가 많은 페이지"가 되어 애드센스 심사에서 반려 사유가 된다.
+        (구글 정책: you may not place more ads than content on your page)
+        상단·하단 광고는 그대로 나가므로 얇은 페이지도 광고가 2개는 붙는다.
+      */}
+      {d && <AdSlot slot={2} />}
 
       {/* 이 본관 이야기 */}
       <section className="mt-10">

@@ -42,6 +42,7 @@ const ADFIT_UNITS: Record<number, string | undefined> = {
  * 만든 광고단위의 크기와 여기 값이 다르면 광고가 아예 안 나온다. 반드시 맞출 것.
  *   1번(하단)  = 300x250  ← 기본값
  *   2번(본문 중간) = 320x100  ← 기본값(실제로 만든 단위 크기와 같다).
+ *   3번(최상단 띠)  = 320x50   ← 기본값. 세 자리 모두 크기가 달라야 만들 수 있다.
  *                    다른 크기로 만들었으면 환경변수로 바꾼다.
  *     NEXT_PUBLIC_ADFIT_SIZE_2 = "336x280" 처럼 넣으면 그 값이 우선한다.
  */
@@ -56,7 +57,7 @@ const ADFIT_SIZES: Record<number, [string, string]> = {
     [process.env.NEXT_PUBLIC_ADFIT_WIDTH ?? "300", process.env.NEXT_PUBLIC_ADFIT_HEIGHT ?? "250"],
   ),
   2: size(process.env.NEXT_PUBLIC_ADFIT_SIZE_2, ["320", "100"]),
-  3: size(process.env.NEXT_PUBLIC_ADFIT_SIZE_3, ["320", "100"]),
+  3: size(process.env.NEXT_PUBLIC_ADFIT_SIZE_3, ["320", "50"]),
 };
 
 export const ADS_ENABLED = Boolean((ADSENSE_CLIENT && ADSENSE_SLOT) || ADFIT_UNITS[1]);

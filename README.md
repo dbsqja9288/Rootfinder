@@ -80,7 +80,7 @@ gh repo create rootfinder --public --source=. --push   # 또는 GitHub 웹에서
    `sitemap.xml` / `robots.txt`가 실제 도메인을 가리킵니다.
 
 ```
-NEXT_PUBLIC_SITE_URL = https://your-project.vercel.app
+NEXT_PUBLIC_SITE_URL = https://rootfinder.kr
 ```
 
 이후 `main` 브랜치에 push할 때마다 자동으로 재배포됩니다.
@@ -117,8 +117,10 @@ AI_MODEL          = claude-haiku-4-5  # 선택. 기본값도 동일
 ```
 THREADS_USER_ID        (Secret)
 THREADS_ACCESS_TOKEN   (Secret)
-SITE_URL               (Variable) https://your-site.vercel.app
 ```
+
+사이트 주소는 워크플로에 `https://rootfinder.kr`로 고정돼 있다.
+예전에 만든 `SITE_URL` 저장소 변수는 더 이상 쓰이지 않는다.
 
 Actions 탭에서 **Run workflow** 버튼으로 즉시 테스트할 수 있습니다.
 

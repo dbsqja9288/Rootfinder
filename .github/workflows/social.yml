@@ -53,7 +53,10 @@ jobs:
         env:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          SITE_URL: ${{ vars.SITE_URL || 'https://rootfinder.kr' }}
+          # 예전에 저장소 변수(vars.SITE_URL)에 넣어둔 vercel.app 주소가 계속 우선해서
+          # 스레드에 옛 주소가 나갔다. 도메인이 확정됐으니 코드에 고정한다.
+          # 변수는 지우지 않아도 되고, 지워도 아무 영향이 없다.
+          SITE_URL: "https://rootfinder.kr"
           VARIANT: ${{ inputs.variant }}
         shell: bash
         run: |
@@ -87,7 +90,10 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-          SITE_URL: ${{ vars.SITE_URL || 'https://rootfinder.kr' }}
+          # 예전에 저장소 변수(vars.SITE_URL)에 넣어둔 vercel.app 주소가 계속 우선해서
+          # 스레드에 옛 주소가 나갔다. 도메인이 확정됐으니 코드에 고정한다.
+          # 변수는 지우지 않아도 되고, 지워도 아무 영향이 없다.
+          SITE_URL: "https://rootfinder.kr"
           VARIANT: ${{ inputs.variant }}
         shell: bash
         run: |

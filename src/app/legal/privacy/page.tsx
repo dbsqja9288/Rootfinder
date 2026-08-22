@@ -39,8 +39,21 @@ export default function PrivacyPage() {
 
       <Section title="3. 방문 통계">
         <p>
-          사이트 개선을 위해 Vercel Analytics로 방문 통계를 봅니다. 이 도구는 개인을 식별하지 않는 형태로 페이지 조회
-          수, 유입 경로, 대략적인 국가·기기 정보만 집계하며, 이용자를 추적하는 쿠키를 사용하지 않습니다.
+          사이트 개선을 위해 Google Analytics(GA4)로 방문 통계를 봅니다. 페이지 조회 수, 유입 경로, 대략적인
+          국가·기기 정보를 집계하며, 이름·연락처처럼 개인을 특정하는 정보는 수집하지 않습니다. 이 과정에서 Google이
+          쿠키를 사용할 수 있습니다.
+        </p>
+        <p className="mt-3">
+          운영자는 광고 개인화 목적의 신호를 GA에서 사용하지 않도록 설정해 두었습니다. 집계 자체를 원하지 않으시면{" "}
+          <a
+            href="https://tools.google.com/dlpage/gaoptout"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent underline underline-offset-2"
+          >
+            Google 애널리틱스 차단 부가기능
+          </a>
+          을 설치하시거나 브라우저에서 쿠키를 차단하시면 됩니다.
         </p>
       </Section>
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import AdSlot from "@/components/AdSlot";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -83,6 +83,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* 방문 통계. GA_ID가 없으면 아무것도 나가지 않는다. */}
+        <GoogleAnalytics id={process.env.NEXT_PUBLIC_GA_ID} />
+
         {/* 애드센스 로더. 환경변수가 없으면 아예 나가지 않는다. */}
         {ADSENSE_CLIENT && (
           <script
@@ -157,7 +160,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
         </div>
-        <Analytics />
       </body>
     </html>
   );

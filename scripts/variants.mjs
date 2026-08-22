@@ -283,20 +283,3 @@ ${svc.tag}`,
 ${url}`,
   };
 }
-
-/* ── 아래는 예전 A/B 구조를 쓰는 스크립트를 위한 호환 껍데기다 ── */
-
-export function pickVariant() {
-  return pickPost().service;
-}
-
-export const VARIANTS = new Proxy(
-  {},
-  {
-    get(_t, key) {
-      if (typeof key !== "string") return undefined;
-      const p = pickPost();
-      return { label: p.label, text: p.text, textX: p.textX, image: p.image };
-    },
-  },
-);

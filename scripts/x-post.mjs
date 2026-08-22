@@ -13,13 +13,13 @@
  *   X_ACCESS_TOKEN       = Access Token
  *   X_ACCESS_SECRET      = Access Token Secret
  * 선택:
- *   SITE_URL, VARIANT=A|B, X_SKIP_MEDIA=1 (이미지 없이 텍스트만)
+ *   SITE_URL, SERVICE=조선|촌수|운세|성씨, POST_ID=..., X_SKIP_MEDIA=1 (이미지 없이 텍스트만)
  *
  * 하나라도 없으면 초안만 출력하고 정상 종료한다(dry-run).
  */
 
 import crypto from "node:crypto";
-import { VARIANTS, pickVariant } from "./variants.mjs";
+import { pickPost } from "./variants.mjs";
 
 const KEY = process.env.X_API_KEY;
 const SECRET = process.env.X_API_SECRET;
@@ -135,11 +135,10 @@ async function tweet(text, mediaId) {
 
 // ── 실행 ──
 
-const key = pickVariant();
-const v = VARIANTS[key];
+const v = pickPost();
 const text = v.textX ?? v.text;
 
-console.log(`[X] 변형 ${key} (${v.label})`);
+console.log(`[X] ${v.label} / 문구 "${v.id}"`);
 console.log("─".repeat(50));
 console.log(text);
 console.log("─".repeat(50));
@@ -171,7 +170,7 @@ try {
 
   const res = await tweet(text, mediaId);
   const id = res?.data?.id;
-  console.log(`\n[X] 게시 완료 [변형 ${key}]: ${id} (이미지 ${mediaId ? "첨부됨" : "없음"})`);
+  console.log(`\n[X] 게시 완료 [${v.label} / ${v.id}]: ${id} (이미지 ${mediaId ? "첨부됨" : "없음"})`);
   if (id) console.log(`확인: https://x.com/i/status/${id}`);
 } catch (e) {
   console.error("\n[X] 실패:", e.message);

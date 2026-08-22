@@ -99,10 +99,17 @@ if (!USER_ID || !TOKEN) {
   process.exit(0);
 }
 
+let res;
 try {
-  const res = await post(v);
-  console.log(`\n게시 완료 [변형 ${key}]: ${res.id} (이미지 ${res.withImage ? "첨부됨" : "없음"})`);
+  res = await post(v);
 } catch (e) {
   console.error("\n실패:", e.message);
   process.exit(1);
 }
+
+// 게시가 끝난 뒤의 코드는 try 밖에 둔다.
+// 안에 두면 로그 한 줄이 잘못돼도 "게시 실패"로 잡혀서,
+// 실제로는 올라간 글을 실패로 착각하게 된다.
+console.log(
+  `\n게시 완료 [${v.label} / ${v.id}]: ${res.id} (이미지 ${res.withImage ? "첨부됨" : "없음"})`,
+);

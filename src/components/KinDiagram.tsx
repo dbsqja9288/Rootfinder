@@ -10,14 +10,10 @@
 export default function KinDiagram({
   myGen,
   otherGen,
-  myLabel,
-  otherLabel,
   maxChon,
 }: {
   myGen: number;
   otherGen: number;
-  myLabel: string;
-  otherLabel: string;
   maxChon: number;
 }) {
   const W = 320;
@@ -77,9 +73,13 @@ export default function KinDiagram({
         최대
       </text>
 
-      {/* 양 끝 */}
-      <End x={leftX} y={botY} title="나" sub={`${myGen}대손`} name={myLabel} filled />
-      <End x={rightX} y={botY} title="상대" sub={`${otherGen}대손`} name={otherLabel} />
+      {/*
+        양 끝. 본관 이름은 넣지 않는다 —
+        여기서 다루는 건 늘 같은 본관이라 양쪽에 같은 글자가 두 번 찍히고,
+        10px로 줄어들어 겹쳐 보이기만 한다. 본관은 카드 위쪽에 이미 적혀 있다.
+      */}
+      <End x={leftX} y={botY} title="나" sub={`${myGen}대손`} filled />
+      <End x={rightX} y={botY} title="상대" sub={`${otherGen}대손`} />
     </svg>
   );
 }
@@ -89,14 +89,12 @@ function End({
   y,
   title,
   sub,
-  name,
   filled,
 }: {
   x: number;
   y: number;
   title: string;
   sub: string;
-  name: string;
   filled?: boolean;
 }) {
   return (
@@ -111,11 +109,8 @@ function End({
       <text x={x} y={y + 22} textAnchor="middle" className="fill-current text-[12px] font-bold">
         {title}
       </text>
-      <text x={x} y={y + 36} textAnchor="middle" className="fill-current text-[10px] text-inksoft">
+      <text x={x} y={y + 37} textAnchor="middle" className="fill-current text-[11px] text-inksoft">
         {sub}
-      </text>
-      <text x={x} y={y + 48} textAnchor="middle" className="fill-current text-[10px] text-inksoft">
-        {name}
       </text>
     </g>
   );

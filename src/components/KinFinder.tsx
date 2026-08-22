@@ -216,13 +216,7 @@ function Compare({
           <div className="card fade-up p-6 text-center sm:p-8">
             {result.kind === "kin" ? (
               <>
-                <KinDiagram
-                  myGen={me!.gen}
-                  otherGen={other.gen}
-                  myLabel={me!.fullName}
-                  otherLabel={other.fullName}
-                  maxChon={result.maxChon}
-                />
+                <KinDiagram myGen={me!.gen} otherGen={other.gen} maxChon={result.maxChon} />
 
                 <p className="mt-4 text-lg font-medium">{result.standing}</p>
 

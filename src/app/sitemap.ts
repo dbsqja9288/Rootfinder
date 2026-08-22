@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/surnames",
     "/joseon",
+    "/fortune",
+    "/kin",
     "/family-tree",
     "/history",
     "/stories",

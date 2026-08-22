@@ -315,6 +315,30 @@ export default function JoseonQuiz({ siteUrl }: { siteUrl: string }) {
               </Link>
             </div>
 
+            {/*
+              다음 콘텐츠로 넘기는 자리.
+              결과를 보고 만족한 직후가 한 번 더 클릭할 확률이 가장 높다.
+              두 개만 둔다. 셋을 넘기면 고르지 않고 그냥 나간다.
+            */}
+            <div className="grid gap-2 pt-2 sm:grid-cols-2">
+              <Link
+                prefetch={false}
+                href="/fortune"
+                className="card p-4 text-left transition hover:border-accent"
+              >
+                <p className="serif font-bold">우리 가문 운세 →</p>
+                <p className="mt-1 text-sm text-inksoft">사주 여덟 글자와 본관으로 보는 이 달의 리포트</p>
+              </Link>
+              <Link
+                prefetch={false}
+                href="/kin"
+                className="card p-4 text-left transition hover:border-accent"
+              >
+                <p className="serif font-bold">이 사람과 몇 촌일까 →</p>
+                <p className="mt-1 text-sm text-inksoft">친구에게 링크를 보내 촌수를 재봅니다</p>
+              </Link>
+            </div>
+
             <p className="pt-1 text-center text-xs leading-relaxed text-inksoft">
               재밌으셨다면{" "}
               <Link prefetch={false} href="/support" className="underline underline-offset-2 transition hover:text-accent">

@@ -58,6 +58,8 @@ export const metadata: Metadata = {
 const NAV = [
   { href: "/surnames", label: "성씨 찾기" },
   { href: "/joseon", label: "조선시대 나는?" },
+  { href: "/fortune", label: "가문 운세" },
+  { href: "/kin", label: "몇 촌일까" },
   { href: "/family-tree", label: "가계도 만들기" },
   { href: "/history", label: "역사 연대표" },
   { href: "/stories", label: "족보 이야기" },

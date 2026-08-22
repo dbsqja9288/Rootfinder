@@ -117,7 +117,7 @@ export default function Home() {
       {/* 본문 중간 광고. 인기 성씨를 훑고 난 자리. */}
       <AdSlot slot={2} />
 
-      {/* 3 features */}
+      {/* 기능 카드. 상단 메뉴만으로는 새 기능이 발견되지 않는다. */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[
@@ -126,6 +126,18 @@ export default function Home() {
               emoji: "🎎",
               title: "조선시대였다면 나는?",
               desc: "본관과 MBTI를 고르면 우리 가문의 등급과 내 직업이 나옵니다. 대장장이일까요, 영의정일까요.",
+            },
+            {
+              href: "/kin",
+              emoji: "🔗",
+              title: "이 사람과 몇 촌일까",
+              desc: "내 링크를 만들어 보내면, 받은 사람이 본관만 넣고 나와 몇 촌인지 확인합니다.",
+            },
+            {
+              href: "/fortune",
+              emoji: "🪷",
+              title: "우리 가문 운세",
+              desc: "생년월일시로 사주 여덟 글자를 세우고, 본관과 대손을 더해 이 달의 리포트를 만듭니다.",
             },
             {
               href: "/family-tree",

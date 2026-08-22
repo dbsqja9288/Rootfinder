@@ -9,20 +9,35 @@
 const API = "https://graph.threads.net/v1.0";
 
 /**
- * 어떤 소재로 올린 글인지 되짚는다. scripts/variants.mjs와 짝을 이룬다.
+ * 어떤 서비스를 홍보한 글인지, 어느 문구였는지 되짚는다.
+ * scripts/variants.mjs와 짝을 이룬다.
  *
- * 문구는 여러 개를 돌려쓰기 때문에 특정 단어로 구분할 수 없다.
- * 대신 **링크 주소**로 가른다. A는 항상 /joseon 으로, B는 홈으로 보낸다.
- * 문구를 바꿔도 이 규칙은 깨지지 않는다.
+ * 서비스는 **링크 주소**로 가른다. 문구를 바꿔도 이 규칙은 안 깨진다.
+ * 문구는 **첫 줄**로 가른다. 문구마다 첫 줄이 다르기 때문에 그것으로 충분하고,
+ * 새 문구를 추가해도 코드를 고칠 필요가 없다.
  */
-export const VARIANT_SIGNS: { key: "A" | "B"; label: string }[] = [
-  { key: "A", label: "신분 자극" },
-  { key: "B", label: "정보 욕구" },
-];
+export type ServiceKey = "조선" | "촌수" | "운세" | "성씨";
 
-export function variantOf(text: string): "A" | "B" | null {
+export const SERVICE_LABEL: Record<ServiceKey, string> = {
+  조선: "조선시대 나는?",
+  촌수: "몇 촌일까",
+  운세: "가문 운세",
+  성씨: "성씨 찾기",
+};
+
+export const SERVICE_ORDER: ServiceKey[] = ["조선", "촌수", "운세", "성씨"];
+
+export function serviceOf(text: string): ServiceKey | null {
   if (!text.includes("rootfinder")) return null; // 우리가 올린 글이 아님
-  return text.includes("/joseon") ? "A" : "B";
+  if (text.includes("/joseon")) return "조선";
+  if (text.includes("/kin")) return "촌수";
+  if (text.includes("/fortune")) return "운세";
+  return "성씨";
+}
+
+/** 문구를 구분하는 열쇠 = 첫 줄. 표에 그대로 보여줘도 읽히는 길이다. */
+export function copyKeyOf(text: string): string {
+  return (text.split("\n").find((l) => l.trim().length > 0) ?? "").trim().slice(0, 40);
 }
 
 export type ThreadPost = {
@@ -30,7 +45,8 @@ export type ThreadPost = {
   text: string;
   timestamp: string;
   permalink?: string;
-  variant: "A" | "B" | null;
+  service: ServiceKey | null;
+  copyKey: string;
   views: number;
   likes: number;
   replies: number;
@@ -105,7 +121,8 @@ export async function loadThreads(limit = 30): Promise<ThreadsData> {
           text,
           timestamp: p.timestamp,
           permalink: p.permalink,
-          variant: variantOf(text),
+          service: serviceOf(text),
+          copyKey: copyKeyOf(text),
           views: metric(ins, "views"),
           likes: metric(ins, "likes"),
           replies: metric(ins, "replies"),
@@ -121,8 +138,8 @@ export async function loadThreads(limit = 30): Promise<ThreadsData> {
   }
 }
 
-export type VariantStat = {
-  key: "A" | "B";
+export type Stat = {
+  key: string;
   label: string;
   count: number;
   views: number;
@@ -130,29 +147,55 @@ export type VariantStat = {
   replies: number;
   reposts: number;
   avgViews: number;
-  engagement: number; // (좋아요+댓글+리포스트) / 조회수
+  engagement: number;
 };
 
-export function summarize(posts: ThreadPost[]): VariantStat[] {
-  return VARIANT_SIGNS.map(({ key, label }) => {
-    const mine = posts.filter((p) => p.variant === key);
-    const sum = (f: (p: ThreadPost) => number) => mine.reduce((a, p) => a + f(p), 0);
-    const views = sum((p) => p.views);
-    const likes = sum((p) => p.likes);
-    const replies = sum((p) => p.replies);
-    const reposts = sum((p) => p.reposts);
-    return {
-      key,
-      label,
-      count: mine.length,
-      views,
-      likes,
-      replies,
-      reposts,
-      avgViews: mine.length ? Math.round(views / mine.length) : 0,
-      engagement: views ? (likes + replies + reposts) / views : 0,
-    };
-  });
+function agg(key: string, label: string, mine: ThreadPost[]): Stat {
+  const sum = (f: (p: ThreadPost) => number) => mine.reduce((a, p) => a + f(p), 0);
+  const views = sum((p) => p.views);
+  const likes = sum((p) => p.likes);
+  const replies = sum((p) => p.replies);
+  const reposts = sum((p) => p.reposts);
+  return {
+    key,
+    label,
+    count: mine.length,
+    views,
+    likes,
+    replies,
+    reposts,
+    avgViews: mine.length ? Math.round(views / mine.length) : 0,
+    // 반응률 = (좋아요+댓글+리포스트) ÷ 조회수
+    engagement: views ? (likes + replies + reposts) / views : 0,
+  };
+}
+
+/** 서비스별 성적. */
+export function summarize(posts: ThreadPost[]): Stat[] {
+  return SERVICE_ORDER.map((k) => agg(k, SERVICE_LABEL[k], posts.filter((p) => p.service === k)));
+}
+
+/**
+ * 서비스 안에서 문구별 성적.
+ *
+ * 1주일 테스트가 끝나면 이 표에서 위 두 개만 남기면 된다.
+ * 판단 기준은 **글당 평균 조회수**다. 총합은 올린 횟수가 많은 쪽이 유리해서 못 쓴다.
+ * 조회수가 비슷하면 반응률(좋아요+댓글+리포스트 비율)이 높은 쪽이 바이럴에 가깝다.
+ */
+export function byCopy(posts: ThreadPost[]): Record<ServiceKey, Stat[]> {
+  const out = {} as Record<ServiceKey, Stat[]>;
+  for (const svc of SERVICE_ORDER) {
+    const mine = posts.filter((p) => p.service === svc);
+    const groups = new Map<string, ThreadPost[]>();
+    for (const p of mine) {
+      const k = p.copyKey || "(빈 글)";
+      groups.set(k, [...(groups.get(k) ?? []), p]);
+    }
+    out[svc] = [...groups.entries()]
+      .map(([k, list]) => agg(k, k, list))
+      .sort((a, b) => b.avgViews - a.avgViews || b.engagement - a.engagement);
+  }
+  return out;
 }
 
 export type RunRow = {

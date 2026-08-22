@@ -6,10 +6,11 @@
  *
  * 환경변수:
  *   THREADS_USER_ID / THREADS_ACCESS_TOKEN / SITE_URL
- *   VARIANT=A 또는 B  (수동 지정. 없으면 시간대에 따라 자동 교대)
+ *   SERVICE=조선|촌수|운세|성씨   (수동 지정. 없으면 시간대에 따라 자동 교대)
+ *   POST_ID=질문                  (수동 지정. 없으면 날짜에 따라 자동 교대)
  */
 
-import { VARIANTS, pickVariant } from "./variants.mjs";
+import { pickPost } from "./variants.mjs";
 
 const USER_ID = process.env.THREADS_USER_ID;
 const TOKEN = process.env.THREADS_ACCESS_TOKEN;
@@ -85,10 +86,9 @@ async function post({ text, image }) {
   return { ...(await published.json()), withImage: Boolean(img) };
 }
 
-const key = pickVariant();
-const v = VARIANTS[key];
+const v = pickPost();
 
-console.log(`변형 ${key} (${v.label})`);
+console.log(`${v.label} / 문구 "${v.id}"`);
 console.log("─".repeat(50));
 console.log(v.text);
 console.log("─".repeat(50));

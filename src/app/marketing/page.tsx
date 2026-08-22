@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
-import { loadThreads, loadRuns, summarize, type ThreadPost } from "@/lib/marketing";
+import {
+  loadThreads,
+  loadRuns,
+  summarize,
+  byCopy,
+  SERVICE_LABEL,
+  SERVICE_ORDER,
+  type ThreadPost,
+} from "@/lib/marketing";
 
 /**
  * 마케팅 대시보드 — 한 화면에서 다 보기.
@@ -63,14 +71,11 @@ export default async function MarketingPage({
 
   const [threads, actions] = await Promise.all([loadThreads(30), loadRuns(24)]);
   const stats = summarize(threads.posts);
+  const copies = byCopy(threads.posts);
+  // 네 서비스 중 글당 평균 조회수가 가장 높은 것. 아직 데이터가 없으면 표시하지 않는다.
+  const scored = stats.filter((s) => s.count > 0);
   const winner =
-    stats[0].count && stats[1].count
-      ? stats[0].avgViews === stats[1].avgViews
-        ? null
-        : stats[0].avgViews > stats[1].avgViews
-          ? stats[0]
-          : stats[1]
-      : null;
+    scored.length >= 2 ? scored.reduce((a, b) => (b.avgViews > a.avgViews ? b : a)) : null;
 
   const totalViews = threads.posts.reduce((a, p) => a + p.views, 0);
   const totalLikes = threads.posts.reduce((a, p) => a + p.likes, 0);
@@ -102,11 +107,12 @@ export default async function MarketingPage({
         </Notice>
       )}
 
-      {/* A/B */}
+      {/* 서비스별 */}
       <section className="mb-10">
-        <h2 className="serif mb-1 text-xl font-bold">A/B 소재 성적표</h2>
+        <h2 className="serif mb-1 text-xl font-bold">서비스별 성적표</h2>
         <p className="mb-4 text-sm text-inksoft">
-          같은 시각에 번갈아 올린 두 소재를 비교합니다. 평균 조회수가 판단 기준입니다.
+          네 서비스를 매시 정각 돌아가며 홍보합니다. 판단 기준은 <strong className="text-ink">글당 평균
+          조회수</strong>입니다. 총합은 올린 횟수가 많은 쪽이 유리해서 쓰지 않습니다.
         </p>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -116,9 +122,7 @@ export default async function MarketingPage({
               className={`card p-5 ${winner?.key === s.key ? "border-accent ring-1 ring-accent/30" : ""}`}
             >
               <div className="flex items-baseline justify-between">
-                <p className="serif text-lg font-bold">
-                  소재 {s.key} <span className="text-sm font-normal text-inksoft">{s.label}</span>
-                </p>
+                <p className="serif text-lg font-bold">{s.label}</p>
                 {winner?.key === s.key && (
                   <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs text-white dark:text-stone-900">
                     앞서는 중
@@ -136,18 +140,66 @@ export default async function MarketingPage({
                 <Cell k="리포스트" v={n(s.reposts)} />
               </dl>
 
-              <p className="mt-3 text-xs text-inksoft">
-                반응률 {(s.engagement * 100).toFixed(2)}% · (좋아요+댓글+리포스트) ÷ 조회수
-              </p>
+              <p className="mt-3 text-xs text-inksoft">반응률 {(s.engagement * 100).toFixed(2)}%</p>
             </div>
           ))}
         </div>
 
         {stats.every((s) => s.count === 0) && (
           <p className="mt-3 text-sm text-inksoft">
-            아직 소재를 구분할 글이 없습니다. 자동 게시가 몇 번 돌고 나면 채워집니다.
+            아직 구분할 글이 없습니다. 자동 게시가 몇 번 돌고 나면 채워집니다.
           </p>
         )}
+      </section>
+
+      {/* 문구별 — 1주일 뒤 여기서 위 2개를 고른다 */}
+      <section className="mb-10">
+        <h2 className="serif mb-1 text-xl font-bold">문구별 순위</h2>
+        <p className="mb-4 text-sm leading-relaxed text-inksoft">
+          서비스마다 문구 6개를 돌려쓰는 중입니다. <strong className="text-ink">1주일 뒤 여기서 위 두 개만
+          남기면</strong> 됩니다. 평균 조회수가 비슷하면 반응률이 높은 쪽이 바이럴에 가깝습니다.
+        </p>
+
+        <div className="space-y-6">
+          {SERVICE_ORDER.map((svc) => {
+            const rows = copies[svc];
+            if (!rows || rows.length === 0) return null;
+            return (
+              <div key={svc}>
+                <p className="serif mb-2 font-bold">{SERVICE_LABEL[svc]}</p>
+                <div className="overflow-x-auto rounded-xl border border-line">
+                  <table className="w-full min-w-[520px] text-sm">
+                    <thead className="bg-elev text-left text-xs text-inksoft">
+                      <tr>
+                        <th className="px-3 py-2.5">문구 (첫 줄)</th>
+                        <th className="px-3 py-2.5 text-right">글수</th>
+                        <th className="px-3 py-2.5 text-right">평균 조회</th>
+                        <th className="px-3 py-2.5 text-right">반응률</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r, i) => (
+                        <tr key={r.key} className={`border-t border-line ${i < 2 ? "bg-accent/5" : ""}`}>
+                          <td className="px-3 py-2.5">
+                            <span className={`mr-2 text-xs ${i < 2 ? "font-bold text-accent" : "text-inksoft"}`}>
+                              {i + 1}
+                            </span>
+                            {r.label}
+                          </td>
+                          <td className="px-3 py-2.5 text-right text-inksoft">{r.count}</td>
+                          <td className="px-3 py-2.5 text-right font-medium">{n(r.avgViews)}</td>
+                          <td className="px-3 py-2.5 text-right text-inksoft">
+                            {(r.engagement * 100).toFixed(2)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {/* 글별 */}
@@ -171,10 +223,13 @@ export default async function MarketingPage({
                 <tr key={p.id} className="border-t border-line">
                   <td className="whitespace-nowrap px-3 py-2.5">{fmtTime(p.timestamp)}</td>
                   <td className="px-3 py-2.5">
-                    {p.variant ? (
-                      <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                        {p.variant}
-                      </span>
+                    {p.service ? (
+                      <div className="min-w-0">
+                        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                          {SERVICE_LABEL[p.service]}
+                        </span>
+                        <p className="mt-1 max-w-[220px] truncate text-xs text-inksoft">{p.copyKey}</p>
+                      </div>
                     ) : (
                       <span className="text-xs text-inksoft">직접 올린 글</span>
                     )}

@@ -27,12 +27,35 @@ export const SERVICE_LABEL: Record<ServiceKey, string> = {
 
 export const SERVICE_ORDER: ServiceKey[] = ["조선", "촌수", "운세", "성씨"];
 
+/**
+ * 원글에는 링크를 넣지 않고 해시태그만 둔다(링크는 마지막 댓글에 있다).
+ * 그래서 서비스는 **태그**로 가르고, 태그가 없는 옛 글은 링크로 가른다.
+ */
+const TAG_TO_SERVICE: [string, ServiceKey][] = [
+  ["#MBTI", "조선"],
+  ["#가족", "촌수"],
+  ["#사주", "운세"],
+  ["#족보", "성씨"],
+];
+
 export function serviceOf(text: string): ServiceKey | null {
-  if (!text.includes("rootfinder")) return null; // 우리가 올린 글이 아님
+  for (const [tag, svc] of TAG_TO_SERVICE) {
+    if (text.includes(tag)) return svc;
+  }
+  // 태그 방식 이전에 올라간 글들(본문에 링크가 있던 시절)
+  if (!text.includes("rootfinder")) return null;
   if (text.includes("/joseon")) return "조선";
   if (text.includes("/kin")) return "촌수";
   if (text.includes("/fortune")) return "운세";
   return "성씨";
+}
+
+/**
+ * 링크가 든 마지막 댓글인지.
+ * 댓글은 원글의 성적이 아니므로 집계에서 뺀다. 섞이면 평균 조회수가 왜곡된다.
+ */
+export function isLinkReply(text: string): boolean {
+  return text.includes("rootfinder.kr") && !TAG_TO_SERVICE.some(([t]) => text.includes(t));
 }
 
 /** 문구를 구분하는 열쇠 = 첫 줄. 표에 그대로 보여줘도 읽히는 길이다. */
@@ -172,7 +195,8 @@ function agg(key: string, label: string, mine: ThreadPost[]): Stat {
 
 /** 서비스별 성적. */
 export function summarize(posts: ThreadPost[]): Stat[] {
-  return SERVICE_ORDER.map((k) => agg(k, SERVICE_LABEL[k], posts.filter((p) => p.service === k)));
+  const roots = posts.filter((p) => !isLinkReply(p.text));
+  return SERVICE_ORDER.map((k) => agg(k, SERVICE_LABEL[k], roots.filter((p) => p.service === k)));
 }
 
 /**
@@ -185,7 +209,7 @@ export function summarize(posts: ThreadPost[]): Stat[] {
 export function byCopy(posts: ThreadPost[]): Record<ServiceKey, Stat[]> {
   const out = {} as Record<ServiceKey, Stat[]>;
   for (const svc of SERVICE_ORDER) {
-    const mine = posts.filter((p) => p.service === svc);
+    const mine = posts.filter((p) => p.service === svc && !isLinkReply(p.text));
     const groups = new Map<string, ThreadPost[]>();
     for (const p of mine) {
       const k = p.copyKey || "(빈 글)";

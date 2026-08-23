@@ -33,9 +33,11 @@ export const SERVICE_ORDER: ServiceKey[] = ["조선", "촌수", "운세", "성�
  */
 const TAG_TO_SERVICE: [string, ServiceKey][] = [
   ["#MBTI", "조선"],
+  ["#조선시대", "조선"], // 태그를 #MBTI로 바꾸기 전에 올린 글
   ["#가족", "촌수"],
   ["#사주", "운세"],
   ["#족보", "성씨"],
+  ["#본관", "성씨"], // A/B 시절 B 소재가 쓰던 태그
 ];
 
 export function serviceOf(text: string): ServiceKey | null {

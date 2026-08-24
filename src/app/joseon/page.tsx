@@ -30,6 +30,14 @@ export default function JoseonPage() {
 
       <JoseonQuiz siteUrl={SITE_URL} />
 
+      {/*
+        퀴즈와 등급 소개 사이의 큰 광고(4번 자리).
+        결과를 다 보고 아래로 내려가는 길목이라 이 페이지에서 가장 오래 머무는 구간이다.
+        MBTI 버튼과는 결과 카드 하나만큼 떨어져 있어 실수 클릭 위험도 낮다.
+        이걸로 이 페이지 광고가 4개 — 애드핏 상한이라 여기서 더 늘리면 안 된다.
+      */}
+      <AdSlot slot={4} />
+
       {/* 등급 소개 */}
       <section className="mt-16">
         <h2 className="serif mb-1 text-xl font-bold">등급은 이렇게 나뉩니다</h2>

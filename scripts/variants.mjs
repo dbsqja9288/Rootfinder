@@ -1,7 +1,8 @@
 /**
  * 스레드와 X가 함께 쓰는 게시 소재.
  *
- * 소재는 A/B 두 개로 고정한다. 실행할 때마다 번갈아 올려서 어느 쪽이 잘 먹히는지 비교한다.
+ * 소재는 A/B 두 개로 고정한다. 실행 일련번호에 따라 A 7 : B 3 비율로 내보낸다.
+ * (반반이 아니다. 근거는 아래 MIX 주석에 적어 뒀다.)
  *
  * ┌─ 문구를 바꾸고 싶을 때 ─────────────────────────────┐
  * │ 아래 A_PICK 값만 바꾸면 된다. 다른 건 손댈 필요 없다.  │
@@ -63,8 +64,11 @@ const A_VERSIONS_JOSEON = {
 암튼 나는 향반 나옴`,
 
   // 낮게 나온 걸 웃음으로 푼다. 댓글 달기 제일 쉬움
-  자조: `조선시대 신분 알려주는 사이트 해봤는데
-나 양인 나옴 ㅋㅋㅋㅋㅋ
+  //
+  // ※ 첫 줄이 '천민없는이유'와 똑같은 "조선시대 신분 알려주는 사이트 해봤는데"였다.
+  //   피드에서는 첫 줄만 보이기 때문에 본문이 달라도 같은 글로 읽힌다.
+  //   그래서 여는 문장만 바꿨다. 나머지는 그대로다.
+  자조: `기대 좀 했는데 나 양인 나옴 ㅋㅋㅋㅋㅋ
 
 근데 조선 인구 대부분이 양인이었다고 위로해주네
 
@@ -194,32 +198,111 @@ const A_TAG = A_TAG_OVERRIDE ?? (A_ANGLE === "joseon" ? "#조선시대" : "#MBTI
  * 한국시간 0시부터 순서대로 적어서 하루 흐름과 맞췄다.
  * 워크플로의 cron과 같은 값을 유지해야 A/B 교대가 정확히 맞는다.
  */
+/**
+ * ※ 이 목록은 이제 **게시 시각의 기록**일 뿐, A/B를 정하지 않는다.
+ *   (정하는 건 위의 seq() + MIX다. 이유는 seq() 주석 참고)
+ *   워크플로의 cron과 맞춰 두면 "언제 올라가는가"를 여기서 읽을 수 있다.
+ */
 export const SLOTS = [15, 16, 17, 18, 20, 22, 0, 1, 2, 3, 4, 6, 8, 10, 11, 12, 13, 14];
 
-/** 오늘 몇 번째 슬롯인지. 예약 시각이 아니면(수동 실행) 날짜로 대신한다. */
-function slotIndex() {
-  const now = new Date();
-  const i = SLOTS.indexOf(now.getUTCHours());
-  return i >= 0 ? i : now.getUTCDate();
+/**
+ * 실행 일련번호 — 이 파일에서 가장 중요한 함수.
+ *
+ * ┌─ 왜 "지금 몇 시인가"로 정하지 않는가 ───────────────────────────┐
+ * │ 예전에는 SLOTS.indexOf(현재 UTC 시각)으로 순번을 정했다.         │
+ * │ 그런데 깃허브 액션의 예약 실행은 **자주 늦는다.**                │
+ * │ 22시 예약이 23시에 돌면 표에 없는 시각이 되어 -1이 나오고,       │
+ * │ 그러면 날짜 홀짝으로 대신 골랐다. 그 결과:                       │
+ * │                                                                  │
+ * │   · 그날 나가는 글이 **전부 같은 소재**로 쏠렸고                 │
+ * │   · 문구 선택까지 같은 값이라 **똑같은 글이 연달아** 올라갔다    │
+ * │                                                                  │
+ * │ 2026-08-26 새벽에 실제로 완전히 동일한 글 3개가 5시간 안에       │
+ * │ 게시된 것을 스레드 계정에서 확인했다. 중복 게시물은 도달이       │
+ * │ 눌리고 사람 눈에도 스팸으로 보인다.                              │
+ * │                                                                  │
+ * │ 깃허브 액션은 실행할 때마다 1씩 늘어나는 번호를 환경변수로 준다. │
+ * │ 늦게 돌든, 같은 시각에 두 번 돌든 절대 겹치지 않는다.            │
+ * └──────────────────────────────────────────────────────────────────┘
+ */
+function seq() {
+  const n = Number(process.env.GITHUB_RUN_NUMBER);
+  if (Number.isFinite(n) && n > 0) return n;
+  // 손으로 돌려볼 때만 쓰는 대비책. 한 시간에 1씩 늘어난다.
+  return Math.floor(Date.now() / 3_600_000);
 }
+
+/**
+ * A와 B를 어떤 비율로 내보낼지.
+ *
+ * ┌─ 7:3인 근거 (GA4 실측, 2026-07-29 ~ 08-25) ────────────────────┐
+ * │ 어느 링크로 사이트에 들어왔는가(방문 페이지 기준):              │
+ * │   A · /joseon  2,788 세션                                       │
+ * │   B · /          998 세션  (/ 880 + /surnames 118)              │
+ * │ 글 수는 거의 반반이었으므로 글 하나당 효율이 약 3배 차이다.     │
+ * │                                                                 │
+ * │ 그래도 B를 0으로 만들지 않는 이유:                              │
+ * │   · 체류가 1.5배 길다 (1분 32초 vs 1분 01초)                    │
+ * │   · 검색 자산(본관 761쪽)이 전부 B 쪽이다. A는 페이지가 하나라  │
+ * │     검색에서 자랄 수 없다.                                      │
+ * └─────────────────────────────────────────────────────────────────┘
+ *
+ * 배열을 그대로 돌린다. B가 한곳에 몰리지 않게 흩어 놓았다.
+ */
+const MIX = ["A", "B", "A", "A", "B", "A", "A", "B", "A", "A"];
 
 export function pickVariant() {
   const forced = (process.env.VARIANT ?? "").toUpperCase();
   if (forced === "A" || forced === "B") return forced;
-  return slotIndex() % 2 === 0 ? "A" : "B";
+  return MIX[seq() % MIX.length];
 }
 
-/** A 문구 고르기. rotate면 날짜+슬롯으로 돌려서 같은 날 같은 문장이 안 겹치게 한다. */
+/**
+ * 이 소재가 지금까지 **몇 번째로** 나가는지.
+ *
+ * 문구를 고를 때 일련번호를 그대로 쓰면 안 된다. A는 10번 중 7번, B는 3번만
+ * 나가기 때문에 번호가 1씩이 아니라 띄엄띄엄 늘어난다. 그 띄엄띄엄한 번호를
+ * 문구 개수로 나누면 **몇몇 문구는 영영 안 나온다.**
+ * (실제로 B 문구 5개 중 2개가 한 번도 안 쓰이는 걸 확인했다.)
+ *
+ * 그래서 "A가 몇 번째 나가는가"를 따로 센다. 이 값은 1씩 늘어나므로
+ * 문구가 하나도 빠짐없이 골고루 돌아간다.
+ */
+function nth(variant) {
+  const s = seq();
+  const perCycle = MIX.filter((v) => v === variant).length;
+  const done = MIX.slice(0, s % MIX.length).filter((v) => v === variant).length;
+  return Math.floor(s / MIX.length) * perCycle + done;
+}
+
+/**
+ * A 문구를 내보내는 **순서**.
+ *
+ * 왜 따로 정하는가 — '천민없는이유'와 '자조'는 첫 줄이
+ * "조선시대 신분 알려주는 사이트 해봤는데"로 완전히 같다.
+ * 본문은 달라도 피드에서는 첫 줄만 보이기 때문에, 이 둘이 연달아 나가면
+ * 읽는 사람에게는 그냥 같은 글을 두 번 올린 것으로 보인다.
+ *
+ * 그래서 순서상 멀찍이 떼어 놓는다(0번과 3번).
+ * A는 일련번호가 1~2씩 건너뛰며 나오므로, 3칸 떨어진 둘은 연속으로 나갈 수 없다.
+ *
+ * 여기 없는 문구는 뒤에 그대로 붙는다. A_ANGLE을 "mbti"로 바꿔도 빠지지 않는다.
+ */
+const A_ORDER = ["천민없는이유", "가족반응", "질문", "자조", "반전", "짧게"];
+
+/**
+ * A 문구 고르기.
+ *
+ * 일련번호를 문구 개수로 나눈 나머지를 쓴다. 일련번호는 실행마다 1씩 늘어나므로
+ * 바로 다음 글이 같은 문구가 되는 일이 구조적으로 없다.
+ */
 function pickAText() {
   const forced = process.env.A_VERSION;
   if (forced && A_BANK[forced]) return A_BANK[forced];
   if (A_PICK !== "rotate") return A_BANK[A_PICK] ?? A_BANK["질문"];
 
-  const names = Object.keys(A_BANK);
-  const day = Math.floor(Date.now() / 86400000);
-  // 슬롯 순서를 2로 나눈 값 = 그날 A가 몇 번째로 나가는지
-  const nth = Math.floor(slotIndex() / 2);
-  return A_BANK[names[(day + nth) % names.length]];
+  const names = [...new Set([...A_ORDER, ...Object.keys(A_BANK)])].filter((k) => A_BANK[k]);
+  return A_BANK[names[nth("A") % names.length]];
 }
 
 const aText = pickAText();
@@ -266,9 +349,7 @@ function pickBText() {
   if (forced && B_VERSIONS[forced]) return B_VERSIONS[forced];
 
   const names = Object.keys(B_VERSIONS);
-  const day = Math.floor(Date.now() / 86400000);
-  const nth = Math.floor(slotIndex() / 2);
-  return B_VERSIONS[names[(day + nth) % names.length]];
+  return B_VERSIONS[names[nth("B") % names.length]];
 }
 
 const bText = pickBText();

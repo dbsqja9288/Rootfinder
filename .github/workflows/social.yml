@@ -44,6 +44,13 @@ on:
         options: ["", "A", "B"]
         default: ""
 
+# 이 워크플로는 저장소에 아무것도 쓰지 않는다. 읽기만 준다.
+#
+# 저장소 기본값을 "Read and write"로 열어 두더라도(성적 수집 워크플로가 커밋을
+# 해야 해서 필요하다), 여기까지 덩달아 쓰기 권한을 갖게 둘 이유는 없다.
+permissions:
+  contents: read
+
 jobs:
   threads:
     name: 스레드

@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
 import HomeSearch from "@/components/HomeSearch";
-import JsonLd, { websiteSchema } from "@/components/JsonLd";
+import JsonLd, { websiteSchema, organizationSchema } from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
+
+/**
+ * 홈은 레이아웃의 기본 제목·설명을 그대로 쓰지만, 정식 주소만은 직접 밝혀둔다.
+ * 이게 없으면 미리보기 도메인(*.vercel.app)이 따로 색인돼 평가가 갈린다.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   const top = SURNAMES.slice(0, 12);
@@ -10,6 +19,7 @@ export default function Home() {
   return (
     <div>
       <JsonLd data={websiteSchema()} />
+      <JsonLd data={organizationSchema()} />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">

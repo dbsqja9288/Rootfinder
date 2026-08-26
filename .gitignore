@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 클라우드에서 파일을 옮길 때 쓰는 임시 폴더 (지워도 됩니다)
+_to_delete/

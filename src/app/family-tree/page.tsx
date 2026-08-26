@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import FamilyTree from "@/components/FamilyTree";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/family-tree" },
   title: "가계도 만들기",
   description: "가족 구성원을 입력해 한 장의 가계도로 그리고 이미지로 저장하세요. 데이터는 브라우저에만 저장됩니다.",
 };

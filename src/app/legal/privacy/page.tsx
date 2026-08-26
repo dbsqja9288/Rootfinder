@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/legal/privacy" },
   title: "개인정보처리방침",
   description: "뿌리찾기가 수집하는 정보와 처리 방식, 쿠키 사용, 이용자의 권리를 안내합니다.",
 };

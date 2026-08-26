@@ -7,15 +7,17 @@ import {
   sameRegionClans,
   siblingClans,
   surnameOf,
+  titleName,
 } from "@/lib/clan-index";
 import { CLAN_DISCLAIMER } from "@/data/surnames";
 import { isDeepDiveEnabled } from "@/lib/ai";
 import { getPatriots } from "@/data/patriots";
 import DeepDive from "@/components/DeepDive";
 import JsonLd, { clanSchema, breadcrumbSchema } from "@/components/JsonLd";
+import Faq from "@/components/Faq";
 import AdSlot from "@/components/AdSlot";
 import ReportError from "@/components/ReportError";
-import { buildBrief } from "@/lib/clan-brief";
+import { buildBrief, buildFaq } from "@/lib/clan-brief";
 
 export function generateStaticParams() {
   return CLAN_ENTRIES.map((c) => ({ id: c.surnameId, clan: c.slug }));
@@ -34,16 +36,34 @@ export async function generateMetadata({
 
   // 해설이 있는 본관과 없는 본관은 약속하는 내용이 달라야 한다.
   // 시조 기록이 없는데 "시조와 유래"라고 걸어두면 검색으로 들어온 사람이 속았다고 느낀다.
-  const title = entry.detail ? `${entry.fullName} — 시조와 유래` : `${entry.fullName} — 본관은 어디인가`;
+  // 한글이 같고 한자가 다른 성씨(조 趙/曺 등)는 이름만으로 구분이 안 된다. 그때만 한자를 붙인다.
+  const name = titleName(entry);
+  const title = entry.detail ? `${name} — 시조와 유래` : `${name} — 본관은 어디인가`;
   const description = entry.detail
     ? `${entry.fullName}(${entry.surnameHanja})의 시조 ${entry.detail.founder}와 본관 지역, 인구를 정리했습니다.${where}`
     : `${entry.fullName}(${entry.surnameHanja})는 어떤 본관인가.${where} 같은 성씨의 다른 본관과 함께 정리했습니다.`;
 
+  /**
+   * 사람들은 검색창에 "김해 김씨"라고 띄어 쓰지 않고 "김해김씨"라고 붙여 친다.
+   * 제목에는 읽기 좋게 띄어 쓴 형태를 두고, 붙인 형태는 키워드로 함께 내보낸다.
+   * (구글은 키워드 태그를 안 보지만 네이버는 아직 참고한다.)
+   */
+  const keywords = [
+    entry.compact,
+    entry.fullName,
+    `${entry.compact} 시조`,
+    `${entry.compact} 항렬`,
+    `${entry.clanName} ${entry.surnameKo}씨`,
+    `${entry.surnameKo}씨 본관`,
+    "본관", "시조", "족보",
+  ];
+
   return {
     title,
     description,
+    keywords,
     alternates: { canonical: entry.href },
-    openGraph: { title, description, type: "article" },
+    openGraph: { title, description, type: "article", url: entry.href },
   };
 }
 
@@ -63,6 +83,8 @@ export default async function ClanPage({
   const patriots = getPatriots(entry.surnameId, entry.slug);
   // 해설이 없는 본관은 확인된 사실만으로 요약을 만들어 빈 페이지가 되지 않게 한다
   const brief = buildBrief(entry, surname);
+  // 검색창에 실제로 치는 문장을 그대로 질문으로 두고, 확인된 사실만 답으로 단다
+  const faq = buildFaq(entry, surname);
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
@@ -208,6 +230,18 @@ export default async function ClanPage({
           </details>
         )}
       </section>
+
+      {/*
+        자주 묻는 질문.
+        위 JSON-LD(faqSchema)에 넣은 것과 **똑같은 문답**을 화면에도 보여준다.
+        구조화 데이터에만 넣고 화면에 없으면 구글 정책 위반이라 반드시 짝을 맞춘다.
+        해설이 없는 본관에서는 이 부분이 사실상 본문 노릇을 한다.
+      */}
+      <Faq
+        title={`${entry.compact}에 대해 자주 묻는 것`}
+        note="확인된 자료로 답할 수 있는 것만 적었습니다. 모르는 것은 모른다고 적습니다."
+        items={faq}
+      />
 
       {/* AI 심층 해설 */}
       {isDeepDiveEnabled() && (

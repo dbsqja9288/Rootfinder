@@ -4,6 +4,8 @@ import ChonsuCalculator from "@/components/ChonsuCalculator";
 import AdSlot from "@/components/AdSlot";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/stories" },
   title: "족보 이야기",
   description: "대동보와 파보의 차이, 본관과 시조, 항렬자 읽는 법, 촌수 계산법까지 족보 입문 가이드.",
 };

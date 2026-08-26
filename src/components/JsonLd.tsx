@@ -73,3 +73,65 @@ export function breadcrumbSchema(items: { name: string; href: string }[]) {
     })),
   };
 }
+
+/**
+ * 사이트를 만든 주체. 홈에 한 번만 넣는다.
+ * 구글이 "이 사이트는 누가 운영하는가"를 판단할 때 쓰고,
+ * 검색 결과 오른쪽 정보 패널의 근거가 되기도 한다.
+ */
+export function organizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "뿌리찾기",
+    url: SITE,
+    logo: `${SITE}/share-preview.png`,
+    email: "dbsqja9288@gmail.com",
+    description:
+      "한국인의 성씨 141개와 본관 761개를 정리해 공개하는 무료 서비스입니다.",
+    knowsLanguage: "ko-KR",
+    areaServed: { "@type": "Country", name: "대한민국" },
+  };
+}
+
+/**
+ * 자주 묻는 질문.
+ *
+ * 사람들이 검색창에 실제로 치는 문장("본관이 뭐예요", "김해김씨 시조가 누구야")을
+ * 그대로 질문으로 두고, 페이지 안에 있는 답을 그대로 답으로 둔다.
+ * 구글이 검색 결과에 질문·답을 접힌 형태로 함께 보여줄 수 있고,
+ * AI 검색 요약이 인용할 때도 이 형식을 잘 집어간다.
+ *
+ * ★ 규칙: 여기 들어가는 답은 **반드시 페이지 본문에도 같은 내용이 있어야 한다.**
+ *   본문에 없는 답을 구조화 데이터에만 넣으면 구글 정책 위반이다.
+ */
+export function faqSchema(items: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  };
+}
+
+/** 목록 페이지(성씨 하나에 딸린 본관들)를 목록으로 알려준다. */
+export function itemListSchema(opts: {
+  name: string;
+  items: { name: string; href: string }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: opts.name,
+    numberOfItems: opts.items.length,
+    itemListElement: opts.items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      url: `${SITE}${it.href}`,
+    })),
+  };
+}

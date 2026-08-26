@@ -4,6 +4,8 @@ import CopyButton from "@/components/CopyButton";
 import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/support" },
   title: "후원하기",
   description: "뿌리찾기는 광고 없이 무료로 운영됩니다. 계속 다듬을 수 있도록 도와주세요.",
 };

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SURNAMES, TOTAL_CLAN_COUNT } from "@/data/surnames";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/about" },
   title: "사이트 소개",
   description:
     "뿌리찾기는 한국인의 성씨와 본관, 시조의 유래를 찾아보는 무료 서비스입니다. 자료의 출처와 만든 이유를 소개합니다.",

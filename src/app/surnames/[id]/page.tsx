@@ -6,6 +6,9 @@ import ClanList from "@/components/ClanList";
 import DeepDive from "@/components/DeepDive";
 import { isDeepDiveEnabled } from "@/lib/ai";
 import AdSlot from "@/components/AdSlot";
+import JsonLd, { breadcrumbSchema, itemListSchema } from "@/components/JsonLd";
+import Faq from "@/components/Faq";
+import { CLAN_ENTRIES } from "@/lib/clan-index";
 
 export function generateStaticParams() {
   return SURNAMES.map((s) => ({ id: s.id }));
@@ -19,9 +22,32 @@ export async function generateMetadata({
   const { id } = await params;
   const s = getSurname(id);
   if (!s) return { title: "찾을 수 없는 성씨" };
+  const clanCount = s.allClans?.length ?? s.clans.length;
+  const top = (s.allClans ?? []).slice(0, 5).join(", ");
+
   return {
-    title: `${s.ko}씨(${s.hanja}) 유래와 본관`,
-    description: s.origin.slice(0, 120),
+    title: `${s.ko}씨(${s.hanja}) 유래와 본관 ${clanCount}개`,
+    // 사람이 검색 결과에서 읽고 누를지 정하는 문장이다. 숫자와 지명을 앞에 둔다.
+    description:
+      `${s.ko}씨는 인구 ${s.rank}위, 약 ${s.population.toLocaleString()}명입니다. ` +
+      `본관 ${clanCount}개를 하나씩 정리했습니다${top ? ` (${top} 등)` : ""}. ` +
+      `${s.origin.slice(0, 60)}`,
+    keywords: [
+      `${s.ko}씨`,
+      `${s.ko}씨 본관`,
+      `${s.ko}씨 유래`,
+      `${s.ko}씨 시조`,
+      `${s.ko}씨 항렬`,
+      `${s.ko}씨 인구`,
+      "본관", "족보", "성씨",
+    ],
+    alternates: { canonical: `/surnames/${s.id}` },
+    openGraph: {
+      title: `${s.ko}씨(${s.hanja}) 유래와 본관 ${clanCount}개`,
+      description: `${s.ko}씨 본관 ${clanCount}개와 시조·유래를 정리했습니다.`,
+      type: "article",
+      url: `/surnames/${s.id}`,
+    },
   };
 }
 
@@ -35,8 +61,57 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
   const next = SURNAMES[idx + 1];
   const maxClan = Math.max(...s.clans.map((c) => c.population ?? 0), 1);
 
+  // 이 성씨에 딸린 본관 페이지들 — 검색엔진에 "여기가 목록"이라고 알려주는 데 쓴다
+  const entries = CLAN_ENTRIES.filter((c) => c.surnameId === s.id);
+  const clanCount = s.allClans?.length ?? s.clans.length;
+
+  /**
+   * 자주 묻는 질문.
+   * 아래 화면에 그대로 보여주는 내용과 **같은 문답**만 넣는다.
+   * (화면에 없는 답을 구조화 데이터에만 넣으면 구글 정책 위반이다.)
+   */
+  const faq = [
+    {
+      q: `${s.ko}씨는 몇 명인가요?`,
+      a: `${s.ko}(${s.hanja})씨는 약 ${s.population.toLocaleString()}명으로 국내 인구 ${s.rank}위입니다. 통계청 「2015 인구주택총조사 성씨·본관 집계」 기준입니다.`,
+    },
+    {
+      q: `${s.ko}씨 본관은 몇 개인가요?`,
+      a:
+        `이 사이트가 확인한 ${s.ko}씨 본관은 ${clanCount}개입니다.` +
+        ((s.allClans?.length ?? 0) > 0
+          ? ` ${s.allClans!.slice(0, 6).join(", ")}${clanCount > 6 ? " 등" : ""}이 있습니다.`
+          : ""),
+    },
+    {
+      q: `본관이 다르면 같은 ${s.ko}씨라도 남인가요?`,
+      a: `네. 본관이 다르면 시조가 다르므로 계통이 전혀 다른 가문입니다. 성씨가 같아도 혈연으로 이어져 있지 않습니다. 한 고을에서 여러 성씨가 일어나기도 했고, 한 성씨가 여러 고을로 퍼지기도 했습니다.`,
+    },
+    {
+      q: `${s.ko}씨의 유래는 무엇인가요?`,
+      a: s.origin,
+    },
+    ...(s.hangryeol
+      ? [{ q: `${s.ko}씨 항렬자는 어떻게 되나요?`, a: s.hangryeol }]
+      : []),
+  ];
+
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "성씨 찾기", href: "/surnames" },
+          { name: `${s.ko}씨`, href: `/surnames/${s.id}` },
+        ])}
+      />
+      {entries.length > 0 && (
+        <JsonLd
+          data={itemListSchema({
+            name: `${s.ko}씨 본관 ${entries.length}개`,
+            items: entries.map((c) => ({ name: c.fullName, href: c.href })),
+          })}
+        />
+      )}
       <Link prefetch={false} href="/surnames" className="text-sm text-inksoft transition hover:text-accent">
         ← 성씨 목록
       </Link>
@@ -154,6 +229,8 @@ export default async function SurnameDetail({ params }: { params: Promise<{ id: 
       )}
 
       {/* CTA */}
+      <Faq title={`${s.ko}씨에 대해 자주 묻는 것`} items={faq} />
+
       <section className="card mt-12 flex flex-wrap items-center justify-between gap-4 bg-accent/5 p-6">
         <div>
           <h3 className="serif font-bold">{s.ko}씨 가계도를 만들어볼까요?</h3>

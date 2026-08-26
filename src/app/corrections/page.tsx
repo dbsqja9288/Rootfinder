@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CORRECTIONS } from "@/data/corrections";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/corrections" },
   title: "정정 내역",
   description:
     "이용자 제보로 바로잡은 성씨·본관 정보를 공개합니다. 무엇이 어떻게 틀렸고 어떻게 고쳤는지 기록합니다.",

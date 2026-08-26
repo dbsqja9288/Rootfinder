@@ -3,6 +3,8 @@ import { ERAS } from "@/data/timeline";
 import AdSlot from "@/components/AdSlot";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/history" },
   title: "역사 연대표",
   description: "고조선부터 현대까지, 한국의 성씨와 본관 제도가 어떻게 만들어졌는지 시대순으로 정리했습니다.",
 };

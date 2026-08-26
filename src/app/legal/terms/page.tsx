@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/legal/terms" },
   title: "이용약관",
   description: "뿌리찾기 서비스의 이용 조건과 콘텐츠의 성격, 책임의 범위를 안내합니다.",
 };

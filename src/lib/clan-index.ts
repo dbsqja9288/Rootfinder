@@ -116,3 +116,28 @@ export function searchClans(query: string, limit = 60): ClanEntry[] {
 }
 
 export const TOTAL_CLANS = CLAN_ENTRIES.length;
+
+/**
+ * 한글로는 같은데 한자가 다른 성씨가 있다.
+ * 조(趙)와 조(曺), 강(姜)과 강(康), 양(梁)과 양(楊)…
+ * 이런 성씨가 같은 고을을 본관으로 쓰면 **"옥천 조씨" 페이지가 두 개**가 된다.
+ *
+ * 제목이 글자 하나까지 똑같으면 구글은 둘 중 하나만 골라 보여주고
+ * 나머지는 "중복 페이지"로 밀어낸다. 실제로는 서로 다른 가문인데도 그렇다.
+ * 그래서 겹치는 이름만 골라내 제목에 한자를 붙여 구분해 준다.
+ */
+const AMBIGUOUS: Set<string> = (() => {
+  const count = new Map<string, number>();
+  for (const c of CLAN_ENTRIES) count.set(c.fullName, (count.get(c.fullName) ?? 0) + 1);
+  return new Set([...count].filter(([, n]) => n > 1).map(([k]) => k));
+})();
+
+/** 이 본관 이름이 다른 성씨와 겹치는가 */
+export function isAmbiguous(entry: ClanEntry): boolean {
+  return AMBIGUOUS.has(entry.fullName);
+}
+
+/** 제목에 쓸 이름. 겹칠 때만 한자를 붙인다. 예: "옥천 조씨(趙)" */
+export function titleName(entry: ClanEntry): string {
+  return isAmbiguous(entry) ? `${entry.fullName}(${entry.surnameHanja})` : entry.fullName;
+}

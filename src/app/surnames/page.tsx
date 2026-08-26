@@ -3,6 +3,8 @@ import { SURNAMES } from "@/data/surnames";
 import SurnameBrowser from "@/components/SurnameBrowser";
 
 export const metadata: Metadata = {
+  // 정식 주소. 미리보기 도메인·물음표 붙은 주소가 따로 색인되지 않게 한다.
+  alternates: { canonical: "/surnames" },
   title: "성씨 찾기",
   description: "한글, 한자, 본관, 시조 이름으로 성씨를 검색하고 유래를 확인해보세요.",
 };

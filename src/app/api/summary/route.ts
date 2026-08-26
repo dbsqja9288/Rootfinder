@@ -46,6 +46,9 @@ export async function GET(req: Request) {
       threads: {
         ok: threads.ok,
         error: threads.error ?? null,
+        /** "file"이면 깃허브 액션이 받아 둔 값을 읽은 것 */
+        source: threads.source ?? null,
+        collectedAt: threads.generatedAt ?? null,
         username: threads.username ?? null,
         followers: threads.followers ?? null,
         /** 서비스별 성적 */

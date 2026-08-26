@@ -85,7 +85,88 @@ export type ThreadsData = {
   username?: string;
   followers?: number | null;
   posts: ThreadPost[];
+  /** 숫자를 어디서 가져왔는지. "file"이면 깃허브 액션이 받아 둔 것을 읽은 것이다. */
+  source?: "live" | "file";
+  /** source가 "file"일 때, 그 파일이 만들어진 시각 */
+  generatedAt?: string | null;
 };
+
+/** data/threads-metrics.json 의 생김새 */
+type Snapshot = {
+  ok?: boolean;
+  generatedAt?: string | null;
+  username?: string | null;
+  followers?: number | null;
+  posts?: {
+    id: string;
+    text: string;
+    timestamp: string;
+    permalink?: string | null;
+    views: number;
+    likes: number;
+    replies: number;
+    reposts: number;
+    quotes: number;
+  }[];
+};
+
+/**
+ * 깃허브 액션이 받아 저장소에 커밋해 둔 파일에서 읽는다.
+ *
+ * ┌─ 왜 이 길이 있나 ────────────────────────────────────────────────┐
+ * │ 스레드 토큰은 깃허브 Secrets에 있고, 한 번 넣으면 다시 꺼내볼 수  │
+ * │ 없다. 그래서 같은 값을 Vercel에 또 넣으려면 메타에서 새로 발급받아│
+ * │ 야 하고, 비밀 사본만 하나 더 늘어난다.                            │
+ * │                                                                   │
+ * │ 그래서 토큰을 이미 가진 쪽(깃허브 액션)이 하루 한 번 숫자를 받아  │
+ * │ data/threads-metrics.json 에 커밋한다. 사이트는 그 파일만 읽는다. │
+ * │ 토큰은 한 군데에만 남고, 사람이 손댈 일도 없다.                   │
+ * │   → .github/workflows/metrics.yml, scripts/collect-metrics.mjs    │
+ * └───────────────────────────────────────────────────────────────────┘
+ *
+ * 어느 서비스·어느 문구인지는 **파일에 적혀 있지 않다.** 그 분류 규칙은
+ * 이 파일 위쪽에 한 벌만 두고, 읽을 때마다 다시 적용한다.
+ * 그래야 규칙을 고쳤을 때 예전에 모아 둔 글까지 새 규칙으로 다시 읽힌다.
+ */
+async function fromRepoFile(limit: number): Promise<ThreadsData> {
+  try {
+    const mod = await import("../../data/threads-metrics.json");
+    const snap = ((mod as { default?: unknown }).default ?? mod) as unknown as Snapshot;
+
+    if (!snap?.ok || !snap.posts?.length) {
+      return {
+        ok: false,
+        error:
+          "스레드 토큰이 없고, 깃허브 액션이 받아 둔 파일도 아직 비어 있습니다. " +
+          "Actions 탭에서 '스레드 성적 수집'을 한 번 실행해 보세요.",
+        posts: [],
+      };
+    }
+
+    return {
+      ok: true,
+      source: "file",
+      generatedAt: snap.generatedAt ?? null,
+      username: snap.username ?? undefined,
+      followers: snap.followers ?? null,
+      posts: snap.posts.slice(0, limit).map((p) => ({
+        id: p.id,
+        text: p.text,
+        timestamp: p.timestamp,
+        permalink: p.permalink ?? undefined,
+        service: serviceOf(p.text),
+        copyKey: copyKeyOf(p.text),
+        views: p.views,
+        likes: p.likes,
+        replies: p.replies,
+        reposts: p.reposts,
+        quotes: p.quotes,
+      })),
+    };
+  } catch (e) {
+    return { ok: false, error: `저장된 성적 파일을 읽지 못했습니다: ${(e as Error).message}`, posts: [] };
+  }
+}
 
 async function j(url: string) {
   const res = await fetch(url, { cache: "no-store" });
@@ -108,9 +189,8 @@ export async function loadThreads(limit = 30): Promise<ThreadsData> {
   const userId = process.env.THREADS_USER_ID;
   const token = process.env.THREADS_ACCESS_TOKEN;
 
-  if (!userId || !token) {
-    return { ok: false, error: "THREADS_USER_ID / THREADS_ACCESS_TOKEN 환경변수가 없습니다.", posts: [] };
-  }
+  // 토큰이 없으면 깃허브 액션이 받아 둔 파일로 간다. 이게 기본 경로다.
+  if (!userId || !token) return fromRepoFile(limit);
 
   try {
     const me = await j(`${API}/me?fields=username&access_token=${token}`);
@@ -157,8 +237,11 @@ export async function loadThreads(limit = 30): Promise<ThreadsData> {
       })
     );
 
-    return { ok: true, username: me?.username, followers, posts };
+    return { ok: true, source: "live", username: me?.username, followers, posts };
   } catch (e) {
+    // 토큰이 만료됐거나 스레드가 잠시 안 될 때도 화면이 비지 않게 파일로 물러선다
+    const saved = await fromRepoFile(limit);
+    if (saved.ok) return { ...saved, error: `실시간 조회 실패(${(e as Error).message}) — 저장된 값으로 대신합니다.` };
     return { ok: false, error: (e as Error).message, posts: [] };
   }
 }

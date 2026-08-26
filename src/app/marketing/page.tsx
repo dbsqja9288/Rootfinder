@@ -107,6 +107,23 @@ export default async function MarketingPage({
         </Notice>
       )}
 
+      {/*
+        숫자의 출처를 밝힌다.
+        "file"이면 이 서버가 스레드에 직접 물어본 게 아니라,
+        깃허브 액션이 하루 한 번 받아서 저장소에 커밋해 둔 값을 읽은 것이다.
+        언제 받은 숫자인지 모르면 "왜 아까랑 같지?" 하고 헷갈리게 된다.
+      */}
+      {threads.ok && threads.source === "file" && (
+        <p className="mb-10 rounded-xl border border-line bg-elev px-4 py-3 text-sm text-inksoft">
+          이 숫자는 <strong className="text-ink">깃허브 액션이 받아 둔 값</strong>입니다
+          {threads.generatedAt && <> · 받은 시각 {fmtTime(threads.generatedAt)}</>}
+          {" "}· 하루 한 번(한국시간 08:30) 갱신됩니다.
+          <br />
+          지금 당장 최신으로 만들려면 깃허브 저장소 → <strong className="text-ink">Actions</strong> →{" "}
+          <strong className="text-ink">스레드 성적 수집</strong> → <strong className="text-ink">Run workflow</strong>.
+        </p>
+      )}
+
       {/* 서비스별 */}
       <section className="mb-10">
         <h2 className="serif mb-1 text-xl font-bold">서비스별 성적표</h2>

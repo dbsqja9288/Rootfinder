@@ -1,0 +1,57 @@
+name: 스레드 성적 수집
+
+# ┌─ 이게 왜 있나 ────────────────────────────────────────────────────┐
+# │ 스레드 토큰은 여기(깃허브 Secrets)에만 있고 다시 꺼내볼 수 없다.  │
+# │ 그러니 토큰을 Vercel로 옮기는 대신, **토큰을 가진 쪽이 숫자를**   │
+# │ **받아서 저장소에 파일로 남긴다.** 사이트는 그 파일만 읽으면 된다.│
+# │                                                                   │
+# │ 결과물: data/threads-metrics.json (사람이 그냥 열어봐도 읽힌다)   │
+# └───────────────────────────────────────────────────────────────────┘
+#
+# 하루 한 번이면 충분하다. 조회수는 며칠에 걸쳐 오르지만,
+# 같은 글을 다시 받으면 새 숫자로 덮어쓰므로 결국 최신값으로 수렴한다.
+
+on:
+  schedule:
+    # UTC 23:30 = 한국시간 08:30. 아침 성과 보고(09:00)보다 앞서 돌게 둔다.
+    - cron: "30 23 * * *"
+  workflow_dispatch: # 손으로 지금 돌려보고 싶을 때
+
+# 파일을 커밋해야 하므로 쓰기 권한이 필요하다
+permissions:
+  contents: write
+
+# 앞 실행이 아직 돌고 있으면 겹쳐 돌리지 않는다 (커밋 충돌 방지)
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 스레드에서 숫자 받아오기
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: node scripts/collect-metrics.mjs
+
+      - name: 바뀐 게 있으면 커밋
+        run: |
+          if git diff --quiet -- data/threads-metrics.json; then
+            echo "바뀐 내용이 없어 커밋하지 않습니다."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/threads-metrics.json
+          git commit -m "chore: 스레드 성적 갱신 $(date -u '+%Y-%m-%d')"
+          # 그 사이 다른 커밋이 올라왔을 수 있으니 한 번 당겨서 얹는다
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

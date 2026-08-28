@@ -64,7 +64,7 @@ async function ranRecently(file: string, token: string, minutes = 20) {
       {
         headers: {
           Accept: "application/vnd.github+json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token.trim()}`,
           "X-GitHub-Api-Version": "2022-11-28",
           "User-Agent": "rootfinder-tick",
         },
@@ -90,7 +90,7 @@ async function dispatch(file: string, token: string) {
       method: "POST",
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token.trim()}`,
         "X-GitHub-Api-Version": "2022-11-28",
         "Content-Type": "application/json",
         "User-Agent": "rootfinder-tick",
@@ -104,6 +104,8 @@ async function dispatch(file: string, token: string) {
 
   // 토큰이 오류 메시지에 섞여 나갈 일은 없지만, 길이를 잘라 로그를 깨끗하게 둔다
   const detail = (await res.text().catch(() => "")).slice(0, 300);
+  // Vercel 로그에 남겨 둔다. 토큰은 여기 섞이지 않는다(깃허브가 돌려준 말뿐이다).
+  console.error(`[tick] 깃허브가 거부했습니다 — ${res.status} ${detail}`);
   return { ok: false as const, status: res.status, detail };
 }
 
@@ -112,6 +114,59 @@ export async function GET(req: Request) {
   const which = url.searchParams.get("w") ?? "social";
   const file = ALLOWED[which];
   if (!file) return json(400, { ok: false, error: `모르는 워크플로: ${which}` });
+
+  /**
+   * 진단 모드 — `?check=<MARKETING_KEY>`
+   *
+   * **아무것도 실행하지 않는다.** 글도 안 올라가고 워크플로도 안 돈다.
+   * 깃허브 토큰이 실제로 통하는지만 읽기 요청으로 확인해서 알려준다.
+   *
+   * 왜 필요한가: 게시가 안 될 때 원인이 (열쇠) (토큰 없음) (토큰이 거부됨)
+   * 셋 중 어느 것인지 밖에서는 구분이 안 됐다. 502만 보고 추측하느라
+   * 시간을 버렸다. 이제 한 번 불러보면 답이 나온다.
+   *
+   * ★ 토큰 값은 어떤 경우에도 돌려주지 않는다. 길이와 생김새만 알려준다.
+   */
+  const check = url.searchParams.get("check");
+  if (check !== null) {
+    const mk = process.env.MARKETING_KEY;
+    if (!mk || check !== mk) return json(401, { ok: false, error: "열쇠가 맞지 않습니다." });
+
+    const t = process.env.GITHUB_DISPATCH_TOKEN;
+    const out: Record<string, unknown> = {
+      ok: true,
+      mode: "진단(실행 안 함)",
+      repo: REPO,
+      ref: BRANCH,
+      workflow: file,
+      CRON_SECRET_있음: Boolean(process.env.CRON_SECRET),
+      GITHUB_DISPATCH_TOKEN_있음: Boolean(t),
+      토큰_길이: t ? t.length : 0,
+      토큰_형태가_맞나: t ? t.startsWith("github_pat_") : false,
+      앞뒤_공백_섞였나: t ? t !== t.trim() : false,
+    };
+
+    if (t) {
+      const h = {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${t.trim()}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "rootfinder-tick",
+      };
+      const r1 = await fetch(`https://api.github.com/repos/${REPO}`, { headers: h, cache: "no-store" });
+      out.저장소_읽기 = r1.status;
+      const r2 = await fetch(
+        `https://api.github.com/repos/${REPO}/actions/workflows/${file}`,
+        { headers: h, cache: "no-store" },
+      );
+      out.워크플로_읽기 = r2.status;
+      if (!r2.ok) out.워크플로_읽기_사유 = (await r2.text().catch(() => "")).slice(0, 200);
+      // 남은 요청 수 — 토큰이 진짜 인증됐는지 보여주는 또 하나의 단서
+      out.깃허브_남은요청 = r1.headers.get("x-ratelimit-remaining");
+    }
+
+    return json(200, out);
+  }
 
   // ── 문지기 ────────────────────────────────────────────────
   // Vercel Cron은 CRON_SECRET 값을 Authorization: Bearer 로 붙여 보낸다.
